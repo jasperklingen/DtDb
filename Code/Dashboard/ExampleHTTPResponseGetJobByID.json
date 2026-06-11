@@ -1,0 +1,55 @@
+{
+	"cpuPercent": 0.17674562540267028,
+	"cpuTime": 38906,
+	"deploymentParameters": {
+	},
+	"directives": {
+		"logFullPath": "{logHome}/{@logFileName(id)}",
+		"urlPrefix": "https://tennet.vicrea.nl/fmedatadownload"
+	},
+	"elapsedTime": 22012426,
+	"engineHost": "localhost",
+	"engineName": "localhost_Engine2",
+	"errorCount": 0,
+	"failureTopics": [
+	],
+	"featureOutputCount": 33,
+	"id": 112193,
+	"lineCount": 229,
+	"maxJobRuntime": -1,
+	"maxTimeInQueue": -1,
+	"peakMemoryUsage": 46301184,
+	"publishedParameters": {
+		"BATCH_SIZE_2": "1000",
+		"REL_ENDPOINT": "https://tennet.relaticsonline.com/DataExchange.asmx?wsdl",
+		"REL_WORKSPACE": "6e2441eb-0161-4cd7-ad11-2d79cd710649",
+		"SERVER_CONNECTION": "tennet.vicrea.nl",
+		"START_QUERY": "1",
+		"VS1_NameExtention": "",
+		"XLSXR_Source": "$(FME_SHAREDRESOURCE_DATA)/BulkImportVS1/11.0/11.0_FME-DynamicConfigurationSheet_VS1-SystemAndProces.xlsx"
+	},
+	"queue": "BulkImportSingleEngine",
+	"queueType": "system",
+	"remoteEngineJobLogUrl": "",
+	"remoteEngineName": "",
+	"repository": "BulkImportRelatics",
+	"requesterHost": "172.29.99.1",
+	"requesterResultPort": -1,
+	"resultDatasetDownloadUrl": "https://tennet.vicrea.nl/fmedatadownload/results/FME_41307E7A_1780392443629_8684.zip",
+	"runtimeUserID": "9ea42e73-b9a1-4e25-a263-4d2af7c5c5d5",
+	"runtimeUserName": "admin_tennet",
+	"sourceID": "bc584297-8ae9-463f-989a-6953f8b4e1c5",
+	"sourceName": "B11-BulkImport-VS1",
+	"sourceType": "workspaceApps",
+	"status": "success",
+	"statusMessage": "Translation Successful",
+	"successTopics": [
+	],
+	"timeFinished": "2026-06-02T15:34:16.062Z",
+	"timeQueued": "2026-06-02T09:27:23.620Z",
+	"timeStarted": "2026-06-02T09:27:23.622Z",
+	"userID": "9ea42e73-b9a1-4e25-a263-4d2af7c5c5d5",
+	"userName": "admin_tennet",
+	"warningCount": 0,
+	"workspace": "SchedulingBulkRelatics_VS1_NoDiscriminator.fmw"
+}

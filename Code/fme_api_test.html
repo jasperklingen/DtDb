@@ -1,0 +1,123 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); color: var(--color-text-primary); }
+  .wrap { padding: 1.5rem 0; }
+  .config { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+  .row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+  .row label { font-size: 13px; color: var(--color-text-secondary); width: 80px; flex-shrink: 0; }
+  .row input { flex: 1; font-size: 13px; }
+  .btn-row { display: flex; gap: 8px; margin-top: 4px; }
+  .status { font-size: 13px; padding: 10px 14px; border-radius: var(--border-radius-md); margin-bottom: 1rem; border: 0.5px solid; }
+  .status.idle    { background: var(--color-background-secondary); border-color: var(--color-border-tertiary); color: var(--color-text-secondary); }
+  .status.loading { background: var(--color-background-info);    border-color: var(--color-border-info);    color: var(--color-text-info); }
+  .status.ok      { background: var(--color-background-success); border-color: var(--color-border-success); color: var(--color-text-success); }
+  .status.err     { background: var(--color-background-danger);  border-color: var(--color-border-danger);  color: var(--color-text-danger); }
+  .result { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; }
+  .result h3 { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 10px; }
+  pre { font-family: var(--font-mono); font-size: 12px; white-space: pre-wrap; word-break: break-all; color: var(--color-text-primary); max-height: 320px; overflow-y: auto; line-height: 1.6; }
+  .meta { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+  .meta-item { font-size: 12px; color: var(--color-text-secondary); }
+  .meta-item span { font-weight: 500; color: var(--color-text-primary); }
+</style>
+
+<div class="wrap">
+  <div class="config">
+    <div class="row">
+      <label>Server URL</label>
+      <input id="server" type="text" placeholder="https://tennet.vicrea.nl/" value="" />
+    </div>
+    <div class="row">
+      <label>API Token</label>
+      <input id="token" type="text" value="13f04bb7af6c9c200e07e6a201fd386234f93b8e" />
+    </div>
+    <div class="row">
+      <label>Endpoint</label>
+      <input id="endpoint" type="text" value="/fmerest/v3/transformations/jobs?limit=10&offset=0" />
+    </div>
+    <div class="btn-row">
+      <button id="btn-test" onclick="runTest()">Test connection</button>
+      <button id="btn-health" onclick="runHealth()">Health check</button>
+      <button id="btn-repos" onclick="runRepos()">List repositories</button>
+    </div>
+  </div>
+
+  <div id="status" class="status idle">Waiting for test...</div>
+
+  <div id="result-wrap" class="result" style="display:none">
+    <h3>Response</h3>
+    <div class="meta" id="meta"></div>
+    <pre id="result-body"></pre>
+  </div>
+</div>
+
+<script>
+function getConfig() {
+  return {
+    server: document.getElementById('server').value.replace(/\/$/, ''),
+    token:  document.getElementById('token').value.trim(),
+    endpoint: document.getElementById('endpoint').value.trim()
+  };
+}
+
+function setStatus(type, msg) {
+  const el = document.getElementById('status');
+  el.className = 'status ' + type;
+  el.textContent = msg;
+}
+
+async function call(url, token) {
+  const start = Date.now();
+  setStatus('loading', 'Calling ' + url + ' ...');
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'Authorization': 'fmetoken token=' + token,
+        'Accept': 'application/json'
+      }
+    });
+    const elapsed = Date.now() - start;
+    let body;
+    try { body = await res.json(); } catch(e) { body = await res.text(); }
+    showResult(res.status, res.statusText, elapsed, body);
+    if (res.ok) {
+      setStatus('ok', '✓ ' + res.status + ' ' + res.statusText + ' — ' + elapsed + 'ms');
+    } else {
+      setStatus('err', '✗ ' + res.status + ' ' + res.statusText);
+    }
+  } catch(e) {
+    setStatus('err', '✗ Network error: ' + e.message + ' (check CORS / server URL)');
+    document.getElementById('result-wrap').style.display = 'none';
+  }
+}
+
+function showResult(status, statusText, elapsed, body) {
+  document.getElementById('result-wrap').style.display = 'block';
+  document.getElementById('meta').innerHTML =
+    `<div class="meta-item">Status <span>${status} ${statusText}</span></div>` +
+    `<div class="meta-item">Time <span>${elapsed}ms</span></div>` +
+    `<div class="meta-item">Items <span>${Array.isArray(body?.items) ? body.items.length : '—'}</span></div>`;
+  document.getElementById('result-body').textContent =
+    typeof body === 'string' ? body : JSON.stringify(body, null, 2);
+}
+
+function runTest() {
+  const { server, token, endpoint } = getConfig();
+  if (!server || !token) { setStatus('err', 'Fill in server URL and token first'); return; }
+  call(server + endpoint, token);
+}
+
+function runHealth() {
+  const { server, token } = getConfig();
+  if (!server || !token) { setStatus('err', 'Fill in server URL and token first'); return; }
+  document.getElementById('endpoint').value = '/fmerest/v3/healthcheck';
+  call(server + '/fmerest/v3/healthcheck', token);
+}
+
+function runRepos() {
+  const { server, token } = getConfig();
+  if (!server || !token) { setStatus('err', 'Fill in server URL and token first'); return; }
+  document.getElementById('endpoint').value = '/fmerest/v3/repositories';
+  call(server + '/fmerest/v3/repositories', token);
+}
+</script>

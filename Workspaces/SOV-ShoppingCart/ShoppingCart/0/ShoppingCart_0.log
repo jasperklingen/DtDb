@@ -1,0 +1,97 @@
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|Current FME version: FME 2025.0.3.0 (20250602 - Build 25241 - WIN64)
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|System Time: 20260609141015 UTC
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME_HOME is 'C:\Program Files\FME202503\'
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Form (floating)
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|Temporary License: 114 days left.
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|Machine host name is: AVT-6GQ3PX3
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|OS Locale Name     : en_NL
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|OS Locale Encoding : windows-1252
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|Process Encoding   : UTF-8
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME API version: '4.0 20240722'
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Configuration: FME_BASE is 'no'
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Configuration: FME_MF_DIR is 'C:\Users\JasperKlingenAvineon\source\repos\DtDb\Workspaces\SOV-ShoppingCart/'
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Configuration: FME_MF_NAME is 'ShoppingCart.fmw'
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Configuration: FME_PRODUCT_NAME is 'FME(R) 2025.0.3.0'
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|Operating System: Microsoft Windows 11 64-bit  (Build 26200)
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Platform: WIN64
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|System Status: 173.73 GB of disk space available in the FME temporary folder (C:\Users\JASPER~1\AppData\Local\Temp\wbrun_1780998689833_26892\fmetmp_0)
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|System Status: 31.69 GB of physical memory available
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|System Status: 126.77 GB of virtual memory available
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|START - ProcessID: 47368, peak process memory usage: 58564 kB, current process memory usage: 57728 kB
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Configuration: Command line arguments are `C:\Program Files\FME202503\fme.exe' `C:\Users\JasperKlingenAvineon\source\repos\DtDb\Workspaces\SOV-ShoppingCart\wb-xlate-1781014211826_26892' `--FME_LAUNCH_VIEWER_APP' `WORKBENCH' `LOG_STANDARDOUT' `YES' `LOG_TIMINGS' `YES' `LogCountServerName' `64783' `LOG_STANDARDOUT' `No' `WORKBENCH_LOG_SERVER' `49786'
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Configuration: Connection Storage: 'C:\Users\JasperKlingenAvineon\AppData\Roaming\Safe Software\FME\'
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|Shared folders for formats are : C:\Program Files\FME202503\datasources;C:\Users\JasperKlingenAvineon\OneDrive - Avineon-Tensing\Documents\FME\Formats
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|Shared folders for transformers are : C:\Users\JasperKlingenAvineon\AppData\Roaming\Safe Software\FME\Packages\25241-win64\transformers;C:\Program Files\FME202503\transformers;C:\Users\JasperKlingenAvineon\AppData\Roaming\Safe Software\FME\FME Store\Transformers
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|Shared folders for coordinate systems are : C:\Users\JasperKlingenAvineon\OneDrive - Avineon-Tensing\Documents\FME\CoordinateSystems
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|Shared folders for coordinate system exceptions are : C:\Users\JasperKlingenAvineon\OneDrive - Avineon-Tensing\Documents\FME\CoordinateSystemExceptions
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|Shared folders for coordinate system grid overrides are : C:\Users\JasperKlingenAvineon\OneDrive - Avineon-Tensing\Documents\FME\CoordinateSystemGridOverrides
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|Shared folders for CS-MAP transformation exceptions are : C:\Users\JasperKlingenAvineon\OneDrive - Avineon-Tensing\Documents\FME\CsmapTransformationExceptions
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|Shared folders for transformer categories are : C:\Users\JasperKlingenAvineon\OneDrive - Avineon-Tensing\Documents\FME\TransformerCategories
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|Mapping File Identifier is: SetupTreeview
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Configuration: No destination coordinate system set
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Configuration: Current working folder is `C:\Users\JasperKlingenAvineon\source\repos\DtDb\Workspaces\SOV-ShoppingCart'
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Configuration: Temporary folder is `C:\Users\JASPER~1\AppData\Local\Temp\wbrun_1780998689833_26892\fmetmp_0', set from environment variable `FME_TEMP'
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Configuration: Cache folder is 'C:\Users\JASPER~1\AppData\Local\Temp'
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Configuration: FME_HOME is `C:\Program Files\FME202503\'
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Configuration: Start freeing memory when the process exceeds 95.08 GB
+2026-06-09 16:10:14|   0.0|  0.0|INFORM|FME Configuration: Stop freeing memory when the process is below 71.31 GB
+2026-06-09 16:10:14|   0.1|  0.1|INFORM|Creating writer for format: 
+2026-06-09 16:10:14|   0.1|  0.0|INFORM|Creating reader for format: 
+2026-06-09 16:10:14|   0.1|  0.0|INFORM|MULTI_READER(MULTI_READER): Will fail with first member reader failure
+2026-06-09 16:10:14|   0.1|  0.0|INFORM|Using Multi Reader with keyword `MULTI_READER' to read multiple datasets
+2026-06-09 16:10:14|   0.1|  0.0|INFORM|Using MultiWriter with keyword `PRIMARY_DEST' to output data (ID_ATTRIBUTE is `multi_writer_id')
+2026-06-09 16:10:14|   0.1|  0.0|INFORM|Writer output will be ordered by value of multi_writer_id
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|Emptying factory pipeline
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|Logger: SHOPPINGCART_UUID:b1dcdbf0-0b8b-4bb6-b6c7-8aba884a8593 
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|Feature Type: `Logger_LOGGED'
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|Attribute(64 bit unsigned integer): `_creation_instance' has value `0'
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|Attribute(string: UTF-8)          : `fme_feature_type' has value `Creator_2'
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|Attribute(indirect: string: UTF-8): `fme_geometry' has value `fme_undefined'
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|Attribute(string: UTF-8)          : `fme_type' has value `fme_no_geom'
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|===========================================================================
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|Geometry Name: <no name>
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|Coordinate System: `Unknown'
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|Geometry Type: Null
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|Coordinate Dimension: 2
+2026-06-09 16:10:15|   0.1|  0.0|INFORM|===========================================================================
+2026-06-09 16:10:15|   0.2|  0.1|STATS |Creator_2_XML_Creator (CreationFactory): Created 1 features
+2026-06-09 16:10:15|   0.2|  0.0|STATS |Creator_2_Cloner (TeeFactory): Cloned 1 input feature(s) into 1 output feature(s)
+2026-06-09 16:10:15|   0.2|  0.0|STATS |Creator_2 CREATED Splitter (TeeFactory): Cloned 1 input feature(s) into 2 output feature(s)
+2026-06-09 16:10:15|   0.2|  0.0|STATS |Creator_2_CREATED_0_RREa/RGmstk= Brancher -1 33 (BranchingFactory): Branched 1 input feature -- 1 feature routed to the target factory, and 0 features routed to the fallback factory.
+2026-06-09 16:10:15|   0.2|  0.0|STATS |Creator_2_CREATED_1_snaevPKpGcM= Brancher -1 46 (BranchingFactory): Branched 1 input feature -- 1 feature routed to the target factory, and 0 features routed to the fallback factory.
+2026-06-09 16:10:15|   0.2|  0.0|STATS |_CREATOR_BRANCH_TARGET (TeeFactory): Cloned 2 input feature(s) into 2 output feature(s)
+2026-06-09 16:10:15|   0.2|  0.0|STATS |Logger_Logger (TeeFactory): Cloned 1 input feature(s) into 1 output feature(s)
+2026-06-09 16:10:15|   0.2|  0.0|STATS |Destination Feature Type Routing Correlator (RoutingFactory): Tested 1 input feature(s), wrote 1 output feature(s): 0 matched merge filters, 0 were routed to output, 1 could not be routed.
+2026-06-09 16:10:15|   0.2|  0.0|STATS |Final Output Nuker (TeeFactory): Cloned 1 input feature(s) into 0 output feature(s)
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |      Features not written - verify feature type fanout/dynamic settings
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |  (Check that fanout/dynamic feature type attribute exists and has a value)
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |                                                                             1
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |==============================================================================
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |Total features not written                                                   1
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+2026-06-09 16:10:15|   0.2|  0.0|STATS |=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+2026-06-09 16:10:15|   0.2|  0.0|STATS |                            Features Read Summary
+2026-06-09 16:10:15|   0.2|  0.0|STATS |=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+2026-06-09 16:10:15|   0.2|  0.0|STATS |==============================================================================
+2026-06-09 16:10:15|   0.2|  0.0|STATS |Total Features Read                                                          0
+2026-06-09 16:10:15|   0.2|  0.0|STATS |=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+2026-06-09 16:10:15|   0.2|  0.0|STATS |=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+2026-06-09 16:10:15|   0.2|  0.0|STATS |                           Features Written Summary
+2026-06-09 16:10:15|   0.2|  0.0|STATS |=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+2026-06-09 16:10:15|   0.2|  0.0|STATS |==============================================================================
+2026-06-09 16:10:15|   0.2|  0.0|STATS |Total Features Written                                                       0
+2026-06-09 16:10:15|   0.2|  0.0|STATS |=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |-~                                                                             ~-
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |-~    Feature caches have been recorded at every stage of the translation.     ~-
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |-~                      To inspect the recorded features,                      ~-
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |-~              click the feature cache icons next to the ports.               ~-
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |-~                                                                             ~-
+2026-06-09 16:10:15|   0.2|  0.0|WARN  |-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+2026-06-09 16:10:15|   0.2|  0.0|INFORM|Translation was SUCCESSFUL with 16 warning(s) (0 feature(s) output)
+2026-06-09 16:10:15|   0.2|  0.0|INFORM|FME Session Duration: 0.6 seconds. (CPU: 0.0s user, 0.2s system)
+2026-06-09 16:10:15|   0.2|  0.0|INFORM|END - ProcessID: 47368, peak process memory usage: 64480 kB, current process memory usage: 64440 kB

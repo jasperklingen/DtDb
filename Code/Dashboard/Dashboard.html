@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BulkImport & SOV — Apps Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --fme-blue: #003A6B;
+      --fme-accent: #0072CE;
+      --fme-light: #E8F1FA;
+    }
+    html, body { height: 100%; }
+    body { background: #F4F6F9; font-family: 'Segoe UI', sans-serif; font-size: 13px; margin: 0; overflow-y: auto; }
+    .dash-header {
+      background: var(--fme-blue);
+      color: #fff;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .dash-header h1 { font-size: 16px; font-weight: 600; margin: 0; }
+    .dash-header .meta { font-size: 11px; opacity: 0.7; }
+    .stat-bar {
+      background: #fff;
+      border-bottom: 1px solid #dee2e6;
+      padding: 8px 20px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .stat-item { display: flex; align-items: center; gap: 6px; }
+    .stat-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .stat-dot.running  { background: #0072CE; }
+    .stat-dot.queued   { background: #F0A500; }
+    .stat-dot.success  { background: #28a745; }
+    .stat-dot.failed   { background: #dc3545; }
+    .stat-label { font-size: 11px; color: #666; }
+    .stat-count { font-size: 13px; font-weight: 600; color: #333; }
+    .filter-bar {
+      background: #fff;
+      padding: 10px 20px;
+      border-bottom: 1px solid #dee2e6;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .filter-bar .form-group { margin: 0; }
+    .filter-bar label { font-size: 11px; font-weight: 600; color: #555; margin-bottom: 2px; display: block; }
+    .filter-bar select { font-size: 12px; height: 30px; padding: 2px 8px; min-width: 160px; }
+    .filter-bar .btn { height: 30px; font-size: 12px; padding: 0 12px; }
+    .refresh-info { margin-left: auto; font-size: 11px; color: #888; display: flex; align-items: center; gap: 6px; }
+    .spinner { display: none; }
+    .spinner.active { display: inline-block; width: 12px; height: 12px; border: 2px solid #ccc; border-top-color: var(--fme-accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .table-wrap { padding: 16px 20px 0; }
+    .table { background: #fff; font-size: 12px; }
+    .table thead th { background: var(--fme-blue); color: #fff; font-weight: 500; font-size: 11px; white-space: nowrap; vertical-align: middle; border: none; padding: 8px 10px; cursor: pointer; user-select: none; }
+    .table thead th:hover { background: #004d99; }
+    .table thead th.sort-asc::after  { content: ' ▲'; font-size: 9px; opacity: 0.9; }
+    .table thead th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 0.9; }
+    .table tbody tr:hover { background: var(--fme-light); }
+    .badge-status { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 500; }
+    .badge-status.success  { background: #d4edda; color: #155724; }
+    .badge-status.failed   { background: #f8d7da; color: #721c24; }
+    .badge-status.running  { background: #cce5ff; color: #004085; }
+    .badge-status.queued   { background: #fff3cd; color: #856404; }
+    .badge-status.aborted  { background: #e2e3e5; color: #383d41; }
+    .error-bar { background: #f8d7da; color: #721c24; padding: 8px 20px; font-size: 12px; display: none; }
+    td { vertical-align: middle !important; }
+    .td-id { font-family: monospace; color: #666; }
+    .td-workspace a { font-size: 11px; }
+    .td-duration { font-family: monospace; }
+    .pagination-bar { padding: 10px 20px 80px; display: flex; align-items: center; gap: 12px; }
+    .pagination-bar .page-info { font-size: 12px; color: #555; }
+    .app-link { color: var(--fme-accent); cursor: pointer; text-decoration: none; font-weight: 500; }
+    .app-link:hover { text-decoration: underline; }
+    .app-link::before { content: '▶ '; font-size: 9px; color: #aaa; }
+    .app-link.expanded::before { content: '▼ '; color: var(--fme-accent); }
+    .detail-row > td { padding: 0 !important; border-top: 2px solid var(--fme-accent) !important; }
+    .detail-panel { padding: 14px 20px 16px; background: #f0f6ff; }
+    .detail-panel-header { font-size: 14px; font-weight: 600; color: var(--fme-blue); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .detail-meta { display: flex; gap: 20px; flex-wrap: wrap; font-size: 12px; margin-bottom: 6px; color: #444; }
+    .detail-meta span { white-space: nowrap; }
+    .detail-ws { font-size: 12px; margin-bottom: 10px; color: #444; }
+    .detail-table { font-size: 11px; background: #fff; margin-bottom: 0; }
+    .detail-table thead th { background: #d0e4f7; color: var(--fme-blue); font-weight: 600; font-size: 11px; padding: 6px 8px; border: 1px solid #b8d4ed; }
+    .detail-table tbody td { padding: 5px 8px; }
+    .detail-no-children { font-size: 12px; color: #888; margin: 8px 0 0; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<div class="dash-header">
+  <h1>BulkImport &amp; SOV — Apps Dashboard</h1>
+  <div class="meta" id="lastUpdated">Laden...</div>
+</div>
+
+<div class="stat-bar">
+  <div class="stat-item"><div class="stat-dot running"></div><span class="stat-label">Running</span><span class="stat-count" id="cnt-running">–</span></div>
+  <div class="stat-item"><div class="stat-dot queued"></div><span class="stat-label">Queued</span><span class="stat-count" id="cnt-queued">–</span></div>
+  <div class="stat-item"><div class="stat-dot success"></div><span class="stat-label">Success</span><span class="stat-count" id="cnt-success">–</span></div>
+  <div class="stat-item"><div class="stat-dot failed"></div><span class="stat-label">Failed</span><span class="stat-count" id="cnt-failed">–</span></div>
+</div>
+
+<div class="error-bar" id="errorBar"></div>
+
+<div class="filter-bar">
+  <div class="form-group">
+    <label>App</label>
+    <select id="filterApp" class="form-control"><option value="">Alle Apps</option></select>
+  </div>
+  <div class="form-group">
+    <label>Gebruiker</label>
+    <select id="filterUser" class="form-control"><option value="">Alle Gebruikers</option></select>
+  </div>
+  <div class="form-group">
+    <label>Status</label>
+    <select id="filterStatus" class="form-control">
+      <option value="">Alle Statussen</option>
+      <option value="SUCCESS">Success</option>
+      <option value="FAILURE">Failure</option>
+      <option value="RUNNING">Running</option>
+      <option value="FME_FAILURE">FME Failure</option>
+      <option value="ABORTED">Aborted</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Repository</label>
+    <select id="filterRepo" class="form-control"><option value="">Alle Repositories</option></select>
+  </div>
+  <button class="btn btn-outline-secondary" id="btnClear">Wis Filters</button>
+  <div class="refresh-info">
+    <div class="spinner" id="spinner"></div>
+    <span id="refreshLabel">–</span>
+    <button class="btn btn-sm btn-outline-primary" id="btnRefresh" style="height:28px;font-size:11px;padding:0 10px;">↻ Vernieuwen</button>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <table class="table table-bordered table-hover" id="jobsTable">
+    <thead>
+      <tr>
+        <th data-col="id">Job ID</th>
+        <th data-col="app">App</th>
+        <th data-col="user">Gebruiker</th>
+        <th data-col="status">Status</th>
+        <th data-col="workspace">Relatics Workspace</th>
+        <th data-col="queued">Toegevoegd</th>
+        <th data-col="started">Gestart</th>
+        <th data-col="finished">Afgerond</th>
+        <th data-col="duration">Duur</th>
+        <th data-col="repo">Repository</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <!-- 50 placeholder rows so FME Flow measures full page height on load -->
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+      <tr class="placeholder-row"><td colspan="10" style="height:79px;border-color:#f0f0f0"></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination-bar" id="paginationBar">
+  <button class="btn btn-sm btn-outline-secondary" id="btnPrev" disabled>‹ Vorige</button>
+  <span class="page-info" id="pageInfo"></span>
+  <button class="btn btn-sm btn-outline-secondary" id="btnNext" disabled>Volgende ›</button>
+</div>
+
+<script>
+const FME_SERVER = 'https://tennet.vicrea.nl';
+const FME_TOKEN  = 'f6e6ba5acb043d84d95a9290339d53a69516f917';
+const PAGE_SIZE  = 50;
+const POLL_MS    = 300000;
+
+const REPOS_FILTER = ['BulkImportRelatics', 'SOV', 'SOV-ShoppingCart'];
+
+// Groups multiple repositories under a single filter label.
+const REPO_GROUPS = {
+  'BulkImportRelatics': ['BulkImportRelatics'],
+  'SOV': ['SOV', 'SOV-ShoppingCart']
+};
+const STATUSES = ['success', 'failure', 'running', 'queued'];
+
+let allJobs             = [];
+let allJobsWithChildren = [];
+let serverOffset  = 0;
+let currentPage   = 0;
+let hasMorePages  = false;
+let lastTotalPages = 1;
+let sortCol       = 'queued';
+let sortDir       = 'desc';
+let pollTimer     = null;
+
+// Fetches one batch of jobs (PAGE_SIZE per status per repo) from the FME API at the current
+// server offset, merges all results, then refreshes the UI from client page 0.
+async function fetchJobs() {
+  setSpinner(true);
+  hideError();
+  try {
+    const repoFilter   = document.getElementById('filterRepo').value;
+    const reposToFetch = repoFilter
+      ? (REPO_GROUPS[repoFilter] || [repoFilter])
+      : REPOS_FILTER;
+    const statusesToFetch = (() => {
+      const sf = document.getElementById('filterStatus').value;
+      return sf ? [sf] : STATUSES;
+    })();
+
+    const requests = reposToFetch.flatMap(repo =>
+      statusesToFetch.map(status => {
+        const url = `${FME_SERVER}/fmeapiv4/jobs?limit=${PAGE_SIZE}&offset=${serverOffset}&status=${encodeURIComponent(status)}&repository=${encodeURIComponent(repo)}`;
+        return fetch(url, { headers: { 'Authorization': `fmetoken token=${FME_TOKEN}`, 'Accept': 'application/json' } });
+      })
+    );
+    const responses = await Promise.all(requests);
+    const datasets  = await Promise.all(responses.map(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+      return res.json();
+    }));
+    allJobsWithChildren = datasets.flatMap(data => data.items || data || []);
+    hasMorePages = datasets.some(d => (d.items || d || []).length >= PAGE_SIZE);
+    sovChildJobIds.clear();
+    allJobs = allJobsWithChildren.filter(
+      j => isParentJob(j) && !sovChildJobIds.has(getField(j, 'id', 'jobId'))
+    );
+    currentPage = 0;
+    updateCounts();
+    populateFilters();
+    renderTable();
+    prefetchSovCartUuids();
+    document.getElementById('lastUpdated').textContent = 'Bijgewerkt: ' + new Date().toLocaleTimeString('nl-NL');
+  } catch(e) {
+    showError('Ophalen mislukt: ' + e.message);
+  } finally {
+    setSpinner(false);
+  }
+}
+
+// Formats an ISO date string to a human-readable Dutch locale datetime string.
+function formatDate(val) {
+  if (!val) return '–';
+  try { return new Date(val).toLocaleString('nl-NL', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
+  catch { return val; }
+}
+
+// Calculates the elapsed time between two ISO date strings and returns it as HH:MM:SS.
+function calcDuration(start, end) {
+  if (!start || !end) return '–';
+  try {
+    const s = Math.round((new Date(end) - new Date(start)) / 1000);
+    return formatSeconds(s);
+  } catch { return '–'; }
+}
+
+// Formats a number of seconds as HH:MM:SS.
+function formatSeconds(s) {
+  if (s == null || s < 0) return '–';
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+// Maps a raw FME job status string to a CSS class name used for badge coloring.
+function statusClass(s) {
+  if (!s) return 'queued';
+  const l = s.toLowerCase();
+  if (l === 'success' || l === 'job_success') return 'success';
+  if (l.includes('fail')) return 'failed';
+  if (l === 'running' || l === 'processing') return 'running';
+  if (l.includes('abort')) return 'aborted';
+  return 'queued';
+}
+
+// Returns the first non-null value found on a job object for the given list of field name candidates.
+function getField(job, ...keys) {
+  for (const k of keys) if (job[k] !== undefined && job[k] !== null) return job[k];
+  return '';
+}
+
+// Returns true if the job is a parent (app-level) job. Child jobs spawned by an app
+// have an engineName containing '@', e.g. "localhost_Engine2@112193".
+function isParentJob(j) {
+  return !(j.engineName || '').includes('@');
+}
+
+const jobDetailsCache = new Map(); // jobId → { workspace, cartUuid } | null
+const sovChildJobIds  = new Set(); // SOV job IDs confirmed to belong to a ShoppingCart
+
+// Fetches published parameters for a job (RelaticsWorkspace / REL_WORKSPACE + SHOPPINGCART_UUID) in one request,
+// caches the result, and updates any workspace cells currently in the DOM.
+async function fetchAndUpdateWorkspace(jobId) {
+  if (jobDetailsCache.has(jobId)) {
+    const cached = jobDetailsCache.get(jobId);
+    updateWorkspaceCell(jobId, cached ? cached.workspace : null);
+    return cached;
+  }
+  try {
+    const res = await fetch(`${FME_SERVER}/fmeapiv4/jobs/${jobId}`, {
+      headers: { 'Authorization': `fmetoken token=${FME_TOKEN}`, 'Accept': 'application/json' }
+    });
+    if (!res.ok) { jobDetailsCache.set(jobId, null); return null; }
+    const data = await res.json();
+    const params = data.publishedParameters || {};
+    const details = {
+      workspace: params['RelaticsWorkspace'] || params['REL_WORKSPACE'] || null,
+      cartUuid:  params['SHOPPINGCART_UUID'] || null
+    };
+    jobDetailsCache.set(jobId, details);
+    updateWorkspaceCell(jobId, details.workspace);
+    return details;
+  } catch {
+    jobDetailsCache.set(jobId, null);
+    return null;
+  }
+}
+
+// Batch-fetches published parameters for all SOV jobs in the background so that SOV runs
+// owned by a ShoppingCart are hidden from the main table (they appear only in the cart panel).
+async function prefetchSovCartUuids() {
+  const sovJobs = allJobsWithChildren.filter(j =>
+    (getField(j, 'repository', 'repositoryName') || '') === 'SOV'
+  );
+  const BATCH = 20;
+  for (let i = 0; i < sovJobs.length; i += BATCH) {
+    await Promise.allSettled(
+      sovJobs.slice(i, i + BATCH).map(j => fetchAndUpdateWorkspace(getField(j, 'id', 'jobId')))
+    );
+  }
+  let changed = false;
+  sovJobs.forEach(j => {
+    const jId = getField(j, 'id', 'jobId');
+    const det = jobDetailsCache.get(jId);
+    if (det && det.cartUuid && !sovChildJobIds.has(jId)) {
+      sovChildJobIds.add(jId);
+      changed = true;
+    }
+  });
+  if (changed) {
+    allJobs = allJobsWithChildren.filter(
+      j => isParentJob(j) && !sovChildJobIds.has(getField(j, 'id', 'jobId'))
+    );
+    renderTable();
+  }
+}
+
+// Opens a ShoppingCart detail panel and asynchronously finds all SOV runs linked to it
+// via the SHOPPINGCART_UUID published parameter, then renders them as child rows.
+async function loadShoppingCartChildren(cartJobId) {
+  fetchAndUpdateWorkspace(cartJobId); // still needed for REL_WORKSPACE cell
+  const cartIdStr = String(cartJobId);
+
+  const sovJobs = allJobsWithChildren.filter(j =>
+    (getField(j, 'repository', 'repositoryName') || '') === 'SOV'
+  );
+
+  const childJobs = [];
+  await Promise.allSettled(sovJobs.map(async j => {
+    const jId = getField(j, 'id', 'jobId');
+    const det = await fetchAndUpdateWorkspace(jId);
+    if (det && det.cartUuid && det.cartUuid === cartIdStr) {
+      childJobs.push(j);
+    }
+  }));
+
+  childJobs.sort((a, b) => (getField(b, 'id', 'jobId') || 0) - (getField(a, 'id', 'jobId') || 0));
+
+  const childTotalSecs = childJobs.reduce((acc, c) => {
+    const s = getField(c, 'timeStarted', 'startTime');
+    const e = getField(c, 'timeFinished', 'endTime', 'finishTime');
+    if (s && e) { const d = Math.round((new Date(e) - new Date(s)) / 1000); if (d >= 0) return acc + d; }
+    return acc;
+  }, 0);
+  const childTotalStr = childJobs.length ? formatSeconds(childTotalSecs) : '–';
+  const durCell = document.querySelector(`[data-job-dur="${cartJobId}"]`);
+  if (durCell) durCell.textContent = childTotalStr;
+  const durEl = document.getElementById(`dp-dur-${cartJobId}`);
+  if (durEl) durEl.textContent = childTotalStr;
+
+  const container = document.getElementById(`cart-children-${cartJobId}`);
+  if (!container) return;
+
+  if (!childJobs.length) {
+    container.innerHTML = '<p class="detail-no-children">Geen SOV-runs gevonden voor deze ShoppingCart.</p>';
+    return;
+  }
+
+  const rows = childJobs.map(c => {
+    const cId       = getField(c, 'id', 'jobId') || '';
+    const cStatus   = getField(c, 'status', 'jobStatus') || '';
+    const cStarted  = getField(c, 'timeStarted', 'startTime') || '';
+    const cFinished = getField(c, 'timeFinished', 'endTime', 'finishTime') || '';
+    const cSc       = statusClass(cStatus);
+    return `<tr>
+      <td class="td-id"><a href="${FME_SERVER}/fmeserver/job/${cId}/summary" target="_blank">${cId}</a></td>
+      <td><span class="badge-status ${cSc}">${cStatus}</span></td>
+      <td>${formatDate(cStarted)}</td>
+      <td>${formatDate(cFinished)}</td>
+      <td class="td-duration">${calcDuration(cStarted, cFinished)}</td>
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `<table class="table table-bordered detail-table mt-2">
+    <thead><tr>
+      <th>Job ID</th><th>Status</th>
+      <th>Gestart</th><th>Afgerond</th><th>Duur</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// Writes the Relatics workspace ID(s) as clickable links into the main table cell
+// and, if the detail panel for this job is open, into the detail panel workspace field.
+function updateWorkspaceCell(jobId, wsId) {
+  const cell = document.querySelector(`[data-job-ws="${jobId}"]`);
+  if (cell) {
+    if (!wsId) { cell.textContent = '–'; }
+    else {
+      const ids = String(wsId).split(',').map(s => s.trim()).filter(Boolean);
+      cell.innerHTML = ids.map(id => `<a href="https://tennet.relaticsonline.com/${id}" target="_blank">${id}</a>`).join('<br>');
+    }
+  }
+  const detailEl = document.getElementById(`dp-ws-val-${jobId}`);
+  if (detailEl) {
+    if (!wsId) { detailEl.textContent = '–'; }
+    else {
+      const ids = String(wsId).split(',').map(s => s.trim()).filter(Boolean);
+      detailEl.innerHTML = ids.map(id => `<a href="https://tennet.relaticsonline.com/${id}" target="_blank">${id}</a>`).join(', ');
+    }
+  }
+}
+
+// Extracts a comparable sort value from a job object for the given column name.
+function getSortValue(j, col) {
+  switch (col) {
+    case 'id':       return String(getField(j, 'id', 'jobId') || '');
+    case 'app':      return (getField(j, 'sourceName', 'appName', 'workspaceApp') || '').toLowerCase();
+    case 'user':     return (getField(j, 'runtimeUserName', 'submittedBy', 'user') || '').toLowerCase();
+    case 'status':   return (getField(j, 'status', 'jobStatus') || '').toLowerCase();
+    case 'workspace':return '';
+    case 'queued':   return new Date(getField(j, 'timeQueued', 'queueTime', 'submittedTime') || 0).getTime();
+    case 'started':  return new Date(getField(j, 'timeStarted', 'startTime') || 0).getTime();
+    case 'finished': return new Date(getField(j, 'timeFinished', 'endTime', 'finishTime') || 0).getTime();
+    case 'duration': {
+      const s = getField(j, 'timeStarted', 'startTime');
+      const e = getField(j, 'timeFinished', 'endTime', 'finishTime');
+      return (s && e) ? new Date(e) - new Date(s) : -1;
+    }
+    case 'repo':     return (getField(j, 'repository', 'repositoryName') || '').toLowerCase();
+    default:         return '';
+  }
+}
+
+// Applies app/user client-side filters and sort, paginates to PAGE_SIZE rows, and renders the
+// current client-side page. Status/repo are handled server-side in fetchJobs.
+function renderTable() {
+  const fApp  = document.getElementById('filterApp').value;
+  const fUser = document.getElementById('filterUser').value;
+
+  const filtered = allJobs.filter(j => {
+    const app  = getField(j, 'sourceName', 'appName', 'workspaceApp') || '';
+    const user = getField(j, 'runtimeUserName', 'submittedBy', 'user') || '';
+    return (!fApp  || app === fApp)
+        && (!fUser || user === fUser);
+  });
+
+  if (sortCol) {
+    filtered.sort((a, b) => {
+      const va = getSortValue(a, sortCol);
+      const vb = getSortValue(b, sortCol);
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ?  1 : -1;
+      return 0;
+    });
+  }
+
+  lastTotalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  if (currentPage >= lastTotalPages) currentPage = lastTotalPages - 1;
+  const rows = filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+
+  const tbody = document.getElementById('tableBody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted" style="padding:20px">Geen resultaten</td></tr>';
+    renderPagination(0);
+    return;
+  }
+
+  tbody.innerHTML = rows.map(j => {
+    const app      = getField(j, 'sourceName', 'appName', 'workspaceApp') || '';
+    const user     = getField(j, 'runtimeUserName', 'submittedBy', 'user') || '';
+    const status   = getField(j, 'status', 'jobStatus') || '';
+    const repo     = getField(j, 'repository', 'repositoryName') || '';
+    const jobId    = getField(j, 'id', 'jobId') || '';
+    const queued   = getField(j, 'timeQueued', 'queueTime', 'submittedTime') || '';
+    const started  = getField(j, 'timeStarted', 'startTime') || '';
+    const finished = getField(j, 'timeFinished', 'endTime', 'finishTime') || '';
+    const sc = statusClass(status);
+    return `<tr data-row-job-id="${jobId}">
+      <td class="td-id"><a href="${FME_SERVER}/fmeserver/job/${jobId}/summary" target="_blank">${jobId}</a></td>
+      <td><span class="app-link" data-job-id="${jobId}" title="Klik voor details">${app || '(geen app)'}</span></td>
+      <td>${user}</td>
+      <td><span class="badge-status ${sc}">${status}</span></td>
+      <td class="td-workspace" data-job-ws="${jobId}">…</td>
+      <td>${formatDate(queued)}</td>
+      <td>${formatDate(started)}</td>
+      <td>${formatDate(finished)}</td>
+      <td class="td-duration" ${repo === 'SOV-ShoppingCart' ? `data-job-dur="${jobId}"` : ''}>${repo === 'SOV-ShoppingCart' ? '–' : calcDuration(started, finished)}</td>
+      <td>${repo}</td>
+    </tr>`;
+  }).join('');
+
+  rows.forEach(j => fetchAndUpdateWorkspace(getField(j, 'id', 'jobId')));
+  renderPagination(filtered.length);
+}
+
+// Updates the pagination bar. Prev is disabled only when on page 1 of the first server batch.
+// Next is disabled when on the last client page of the last server batch.
+function renderPagination(total) {
+  document.getElementById('pageInfo').textContent =
+    total > 0 ? `Pagina ${currentPage + 1} van ${lastTotalPages} (${total} resultaten)` : '';
+  document.getElementById('btnPrev').disabled = currentPage === 0 && serverOffset === 0;
+  document.getElementById('btnNext').disabled = currentPage >= lastTotalPages - 1 && !hasMorePages;
+}
+
+// Rebuilds the filter dropdowns (app, user, repository) from the current set of loaded jobs,
+// preserving any already-selected value.
+function populateFilters() {
+  const apps  = [...new Set(allJobs.map(j => getField(j, 'sourceName', 'appName', 'workspaceApp')).filter(Boolean))].sort();
+  const users = [...new Set(allJobs.map(j => getField(j, 'runtimeUserName', 'submittedBy', 'user')).filter(Boolean))].sort();
+  fillSelect('filterApp', apps);
+  fillSelect('filterUser', users);
+  fillSelect('filterRepo', Object.keys(REPO_GROUPS));
+}
+
+// Repopulates a <select> element with the given values while keeping the current selection if still valid.
+function fillSelect(id, values) {
+  const sel = document.getElementById(id);
+  const cur = sel.value;
+  while (sel.options.length > 1) sel.remove(1);
+  values.forEach(v => { const o = new Option(v, v); sel.appendChild(o); });
+  if ([...sel.options].some(o => o.value === cur)) sel.value = cur;
+}
+
+// Counts parent jobs by status category and updates the summary stat bar at the top.
+function updateCounts() {
+  const counts = { running: 0, queued: 0, success: 0, failed: 0 };
+  allJobs.forEach(j => {
+    const sc = statusClass(getField(j, 'status', 'jobStatus') || '');
+    if (counts[sc] !== undefined) counts[sc]++;
+    else if (sc === 'aborted') counts.failed++;
+    else counts.queued++;
+  });
+  document.getElementById('cnt-running').textContent = counts.running;
+  document.getElementById('cnt-queued').textContent  = counts.queued;
+  document.getElementById('cnt-success').textContent = counts.success;
+  document.getElementById('cnt-failed').textContent  = counts.failed;
+}
+
+// Shows or hides the loading spinner and updates the last-refresh label accordingly.
+function setSpinner(on) {
+  document.getElementById('spinner').classList.toggle('active', on);
+  document.getElementById('refreshLabel').textContent = on ? 'Ophalen...' : ('Laatste refresh: ' + new Date().toLocaleTimeString('nl-NL'));
+}
+
+// Displays an error message in the error bar above the table.
+function showError(msg) {
+  const bar = document.getElementById('errorBar');
+  bar.textContent = msg;
+  bar.style.display = 'block';
+}
+
+// Hides the error bar.
+function hideError() { document.getElementById('errorBar').style.display = 'none'; }
+
+// Starts (or restarts) the auto-refresh interval that re-fetches jobs every POLL_MS milliseconds.
+function startPolling() {
+  clearInterval(pollTimer);
+  pollTimer = setInterval(fetchJobs, POLL_MS);
+}
+
+document.getElementById('btnRefresh').addEventListener('click', fetchJobs);
+document.getElementById('btnClear').addEventListener('click', () => {
+  ['filterApp','filterUser','filterStatus','filterRepo'].forEach(id => document.getElementById(id).value = '');
+  serverOffset = 0;
+  fetchJobs();
+});
+// Status and repo filters are applied server-side — reload from offset 0.
+['filterStatus','filterRepo'].forEach(id =>
+  document.getElementById(id).addEventListener('change', () => { serverOffset = 0; fetchJobs(); })
+);
+// App and user filters are applied client-side on the loaded page.
+['filterApp','filterUser'].forEach(id =>
+  document.getElementById(id).addEventListener('change', () => { currentPage = 0; renderTable(); })
+);
+document.getElementById('btnPrev').addEventListener('click', () => {
+  if (currentPage > 0) { currentPage--; renderTable(); }
+  else if (serverOffset > 0) { serverOffset -= PAGE_SIZE; fetchJobs(); }
+});
+document.getElementById('btnNext').addEventListener('click', () => {
+  if (currentPage < lastTotalPages - 1) { currentPage++; renderTable(); }
+  else if (hasMorePages) { serverOffset += PAGE_SIZE; fetchJobs(); }
+});
+
+document.querySelectorAll('#jobsTable thead th[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.col;
+    sortDir = (sortCol === col && sortDir === 'asc') ? 'desc' : 'asc';
+    sortCol = col;
+    document.querySelectorAll('#jobsTable thead th').forEach(t => t.classList.remove('sort-asc', 'sort-desc'));
+    th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+    renderTable();
+  });
+});
+
+// Apply initial sort indicator for default queued-desc sort.
+const initSortTh = document.querySelector('#jobsTable thead th[data-col="queued"]');
+if (initSortTh) initSortTh.classList.add('sort-desc');
+
+// Toggles the inline detail panel for a parent job row. If the panel is already open it is
+// removed; otherwise a new detail row is inserted directly below the parent row and the
+// Relatics workspace is fetched asynchronously.
+function toggleDetailRow(jobId) {
+  const existing = document.getElementById(`detail-row-${jobId}`);
+  const link = document.querySelector(`.app-link[data-job-id="${jobId}"]`);
+  if (existing) {
+    existing.remove();
+    if (link) link.classList.remove('expanded');
+    return;
+  }
+
+  const job = allJobs.find(j => String(getField(j, 'id', 'jobId')) === String(jobId));
+  if (!job) return;
+
+  const parentRow = document.querySelector(`tr[data-row-job-id="${jobId}"]`);
+  if (!parentRow) return;
+
+  const repo = getField(job, 'repository', 'repositoryName') || '';
+  const isShoppingCart = repo === 'SOV-ShoppingCart';
+
+  const childJobs = isShoppingCart
+    ? []
+    : allJobsWithChildren
+        .filter(j => (j.engineName || '').endsWith('@' + jobId))
+        .sort((a, b) => (b.id || 0) - (a.id || 0));
+
+  const detailTr = document.createElement('tr');
+  detailTr.id = `detail-row-${jobId}`;
+  detailTr.className = 'detail-row';
+  detailTr.innerHTML = `<td colspan="10">${buildDetailPanel(job, childJobs, jobId, isShoppingCart)}</td>`;
+  parentRow.insertAdjacentElement('afterend', detailTr);
+
+  if (link) link.classList.add('expanded');
+  fetchAndUpdateWorkspace(jobId);
+  if (isShoppingCart) loadShoppingCartChildren(jobId);
+}
+
+// Builds the HTML for the detail panel of a parent job, including a summary header with
+// metadata and a table of child jobs. For ShoppingCart jobs the child section is an async
+// placeholder filled in by loadShoppingCartChildren(); for BulkImport jobs it uses engineName.
+function buildDetailPanel(job, childJobs, jobId, isShoppingCart = false) {
+  const app      = getField(job, 'sourceName', 'appName', 'workspaceApp') || '(geen app)';
+  const user     = getField(job, 'runtimeUserName', 'submittedBy', 'user') || '–';
+  const status   = getField(job, 'status', 'jobStatus') || '';
+  const queued   = getField(job, 'timeQueued', 'queueTime', 'submittedTime') || '';
+  const started  = getField(job, 'timeStarted', 'startTime') || '';
+  const finished = getField(job, 'timeFinished', 'endTime', 'finishTime') || '';
+  const sc       = statusClass(status);
+
+  const childRows = childJobs.map(c => {
+    const cId       = getField(c, 'id', 'jobId') || '';
+    const cStatus   = getField(c, 'status', 'jobStatus') || '';
+    const cStarted  = getField(c, 'timeStarted', 'startTime') || '';
+    const cFinished = getField(c, 'timeFinished', 'endTime', 'finishTime') || '';
+    const cSc       = statusClass(cStatus);
+    return `<tr>
+      <td class="td-id"><a href="${FME_SERVER}/fmeserver/job/${cId}/summary" target="_blank">${cId}</a></td>
+      <td><span class="badge-status ${cSc}">${cStatus}</span></td>
+      <td>${formatDate(cStarted)}</td>
+      <td>${formatDate(cFinished)}</td>
+      <td class="td-duration">${calcDuration(cStarted, cFinished)}</td>
+    </tr>`;
+  }).join('');
+
+  const childTable = isShoppingCart
+    ? `<div id="cart-children-${jobId}"><p class="detail-no-children">SOV-runs laden...</p></div>`
+    : childJobs.length > 0
+      ? `<table class="table table-bordered detail-table mt-2">
+          <thead><tr>
+            <th>Job ID</th><th>Status</th>
+            <th>Gestart</th><th>Afgerond</th><th>Duur</th>
+          </tr></thead>
+          <tbody>${childRows}</tbody>
+        </table>`
+      : `<p class="detail-no-children">Geen sub-processen gevonden voor deze job.</p>`;
+
+  return `<div class="detail-panel">
+    <div class="detail-panel-header">
+      ${app}
+      <span class="badge-status ${sc}">${status}</span>
+    </div>
+    <div class="detail-meta">
+      <span>Job ID: <a href="${FME_SERVER}/fmeserver/job/${jobId}/summary" target="_blank">${jobId}</a></span>
+      <span>Gebruiker: <strong>${user}</strong></span>
+      <span>Toegevoegd: ${formatDate(queued)}</span>
+      <span>Gestart: ${formatDate(started)}</span>
+      <span>Afgerond: ${formatDate(finished)}</span>
+      <span>Totale duur: <strong>${isShoppingCart ? `<span id="dp-dur-${jobId}">–</span>` : calcDuration(started, finished)}</strong></span>
+    </div>
+    <div class="detail-ws">Relatics Workspace: <span id="dp-ws-val-${jobId}">…</span></div>
+    ${childTable}
+  </div>`;
+}
+
+document.getElementById('tableBody').addEventListener('click', function(e) {
+  const link = e.target.closest('.app-link');
+  if (link) toggleDetailRow(link.dataset.jobId);
+});
+
+fetchJobs();
+startPolling();
+</script>
+</body>
+</html>

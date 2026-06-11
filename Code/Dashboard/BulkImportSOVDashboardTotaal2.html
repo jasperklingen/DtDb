@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BulkImport & SOV — Totaal Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --fme-blue: #003A6B;
+      --fme-accent: #0072CE;
+      --fme-light: #E8F1FA;
+    }
+    html, body { height: 100%; }
+    body { background: #F4F6F9; font-family: 'Segoe UI', sans-serif; font-size: 13px; overflow-y: auto; }
+    .dash-header {
+      background: var(--fme-blue);
+      color: #fff;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .dash-header h1 { font-size: 16px; font-weight: 600; margin: 0; }
+    .dash-header .meta { font-size: 11px; opacity: 0.7; }
+    .stat-bar {
+      background: #fff;
+      border-bottom: 1px solid #dee2e6;
+      padding: 8px 20px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .stat-item { display: flex; align-items: center; gap: 6px; }
+    .stat-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .stat-dot.running  { background: #0072CE; }
+    .stat-dot.queued   { background: #F0A500; }
+    .stat-dot.success  { background: #28a745; }
+    .stat-dot.failed   { background: #dc3545; }
+    .stat-label { font-size: 11px; color: #666; }
+    .stat-count { font-size: 13px; font-weight: 600; color: #333; }
+    .filter-bar {
+      background: #fff;
+      padding: 10px 20px;
+      border-bottom: 1px solid #dee2e6;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .filter-bar .form-group { margin: 0; }
+    .filter-bar label { font-size: 11px; font-weight: 600; color: #555; margin-bottom: 2px; display: block; }
+    .filter-bar select { font-size: 12px; height: 30px; padding: 2px 8px; min-width: 160px; }
+    .filter-bar .btn { height: 30px; font-size: 12px; padding: 0 12px; }
+    .refresh-info { margin-left: auto; font-size: 11px; color: #888; display: flex; align-items: center; gap: 6px; }
+    .spinner { display: none; }
+    .spinner.active { display: inline-block; width: 12px; height: 12px; border: 2px solid #ccc; border-top-color: var(--fme-accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .table-wrap { padding: 16px 20px; }
+    .table { background: #fff; font-size: 12px; }
+    .table thead th { background: var(--fme-blue); color: #fff; font-weight: 500; font-size: 11px; white-space: nowrap; vertical-align: middle; border: none; padding: 8px 10px; }
+    .table tbody tr:hover { background: var(--fme-light); }
+    .badge-status { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 500; }
+    .badge-status.success  { background: #d4edda; color: #155724; }
+    .badge-status.failed   { background: #f8d7da; color: #721c24; }
+    .badge-status.running  { background: #cce5ff; color: #004085; }
+    .badge-status.queued   { background: #fff3cd; color: #856404; }
+    .badge-status.aborted  { background: #e2e3e5; color: #383d41; }
+    .error-bar { background: #f8d7da; color: #721c24; padding: 8px 20px; font-size: 12px; display: none; }
+    td { vertical-align: middle !important; }
+    .td-id { font-family: monospace; color: #666; }
+    .td-workspace a { font-size: 11px; }
+    .td-duration { font-family: monospace; }
+  </style>
+</head>
+<body>
+
+<div class="dash-header">
+  <h1>BulkImport &amp; SOV — Totaal Dashboard</h1>
+  <div class="meta" id="lastUpdated">Laden...</div>
+</div>
+
+<div class="stat-bar">
+  <div class="stat-item"><div class="stat-dot running"></div><span class="stat-label">Running</span><span class="stat-count" id="cnt-running">–</span></div>
+  <div class="stat-item"><div class="stat-dot queued"></div><span class="stat-label">Queued</span><span class="stat-count" id="cnt-queued">–</span></div>
+  <div class="stat-item"><div class="stat-dot success"></div><span class="stat-label">Success</span><span class="stat-count" id="cnt-success">–</span></div>
+  <div class="stat-item"><div class="stat-dot failed"></div><span class="stat-label">Failed</span><span class="stat-count" id="cnt-failed">–</span></div>
+</div>
+
+<div class="error-bar" id="errorBar"></div>
+
+<div class="filter-bar">
+  <div class="form-group">
+    <label>App</label>
+    <select id="filterApp" class="form-control"><option value="">Alle Apps</option></select>
+  </div>
+  <div class="form-group">
+    <label>Gebruiker</label>
+    <select id="filterUser" class="form-control"><option value="">Alle Gebruikers</option></select>
+  </div>
+  <div class="form-group">
+    <label>Status</label>
+    <select id="filterStatus" class="form-control">
+      <option value="">Alle Statussen</option>
+      <option value="SUCCESS">Success</option>
+      <option value="FAILED">Failed</option>
+      <option value="RUNNING">Running</option>
+      <option value="FME_FAILURE">FME Failure</option>
+      <option value="ABORTED">Aborted</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Repository</label>
+    <select id="filterRepo" class="form-control"><option value="">Alle Repositories</option></select>
+  </div>
+  <div class="form-group">
+    <label>Workspace</label>
+    <select id="filterWorkspace" class="form-control"><option value="">Alle Workspaces</option></select>
+  </div>
+  <button class="btn btn-outline-secondary" id="btnClear">Wis Filters</button>
+  <div class="refresh-info">
+    <div class="spinner" id="spinner"></div>
+    <span id="refreshLabel">–</span>
+    <button class="btn btn-sm btn-outline-primary" id="btnRefresh" style="height:28px;font-size:11px;padding:0 10px;">↻ Vernieuwen</button>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <table class="table table-bordered table-hover" id="jobsTable">
+    <thead>
+      <tr>
+        <th>Job ID</th>
+        <th>App</th>
+        <th>Gebruiker</th>
+        <th>Status</th>
+        <th>Relatics Workspace</th>
+        <th>Toegevoegd</th>
+        <th>Gestart</th>
+        <th>Afgerond</th>
+        <th>Duur</th>
+        <th>Repository</th>
+        <th>Workspace</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr><td colspan="11" class="text-center text-muted" style="padding:30px">Laden...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+const FME_SERVER = 'https://tennet.vicrea.nl';
+const FME_TOKEN  = 'f6e6ba5acb043d84d95a9290339d53a69516f917';
+const LIMIT      = 500;
+const POLL_MS    = 60000;
+
+const REPOS_FILTER = ['BulkImportRelatics', 'SOV'];
+const STATUSES     = ['success', 'failure', 'running', 'queued'];
+
+let allJobs = [];
+let pollTimer = null;
+
+async function fetchJobs() {
+  setSpinner(true);
+  hideError();
+  try {
+    const requests = REPOS_FILTER.flatMap(repo =>
+      STATUSES.map(status => {
+        const url = `${FME_SERVER}/fmeapiv4/jobs?limit=${LIMIT}&offset=0&status=${status}&repository=${encodeURIComponent(repo)}`;
+        return fetch(url, { headers: { 'Authorization': `fmetoken token=${FME_TOKEN}`, 'Accept': 'application/json' } });
+      })
+    );
+    const responses = await Promise.all(requests);
+    const datasets  = await Promise.all(responses.map(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+      return res.json();
+    }));
+    allJobs = datasets.flatMap(data => data.items || data || []);
+    updateCounts();
+    populateFilters();
+    renderTable();
+    document.getElementById('lastUpdated').textContent = 'Bijgewerkt: ' + new Date().toLocaleTimeString('nl-NL');
+  } catch(e) {
+    showError('Ophalen mislukt: ' + e.message);
+  } finally {
+    setSpinner(false);
+  }
+}
+
+function formatDate(val) {
+  if (!val) return '–';
+  try { return new Date(val).toLocaleString('nl-NL', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
+  catch { return val; }
+}
+
+function calcDuration(start, end) {
+  if (!start || !end) return '–';
+  try {
+    const s = Math.round((new Date(end) - new Date(start)) / 1000);
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  } catch { return '–'; }
+}
+
+function statusClass(s) {
+  if (!s) return 'queued';
+  const l = s.toLowerCase();
+  if (l === 'success' || l === 'job_success') return 'success';
+  if (l.includes('fail')) return 'failed';
+  if (l === 'running' || l === 'processing') return 'running';
+  if (l.includes('abort')) return 'aborted';
+  return 'queued';
+}
+
+function getField(job, ...keys) {
+  for (const k of keys) if (job[k] !== undefined && job[k] !== null) return job[k];
+  return '';
+}
+
+function renderTable() {
+  const fApp       = document.getElementById('filterApp').value;
+  const fUser      = document.getElementById('filterUser').value;
+  const fStatus    = document.getElementById('filterStatus').value;
+  const fRepo      = document.getElementById('filterRepo').value;
+  const fWorkspace = document.getElementById('filterWorkspace').value;
+
+  const rows = allJobs.filter(j => {
+    const app       = getField(j, 'sourceName', 'appName', 'workspaceApp') || '';
+    const user      = getField(j, 'userName', 'submittedBy', 'user') || '';
+    const status    = getField(j, 'status', 'jobStatus') || '';
+    const repo      = getField(j, 'repository', 'repositoryName') || '';
+    const workspace = getField(j, 'workspace', 'workspaceName') || '';
+    return (!fApp       || app === fApp)
+        && (!fUser      || user === fUser)
+        && (!fStatus    || status.toUpperCase() === fStatus.toUpperCase())
+        && (!fRepo      || repo === fRepo)
+        && (!fWorkspace || workspace === fWorkspace);
+  });
+
+  const tbody = document.getElementById('tableBody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted" style="padding:20px">Geen resultaten</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows.map(j => {
+    const app       = getField(j, 'sourceName', 'appName', 'workspaceApp') || '';
+    const user      = getField(j, 'userName', 'submittedBy', 'user') || '';
+    const status    = getField(j, 'status', 'jobStatus') || '';
+    const repo      = getField(j, 'repository', 'repositoryName') || '';
+    const workspace = getField(j, 'workspace', 'workspaceName') || '';
+    const jobId     = getField(j, 'id', 'jobId') || '';
+    const queued    = getField(j, 'timeQueued', 'queueTime', 'submittedTime') || '';
+    const started   = getField(j, 'timeStarted', 'startTime') || '';
+    const finished  = getField(j, 'timeFinished', 'endTime', 'finishTime') || '';
+    const wsParam   = getField(j, 'publishedParameters', 'parameters') || '';
+    let wsLinks = '';
+    if (wsParam && typeof wsParam === 'object' && !Array.isArray(wsParam)) {
+      const wsId = wsParam['REL_WORKSPACE'] || wsParam['RELATICS_WORKSPACE_ID'] || wsParam['WorkspaceId'];
+      if (wsId) {
+        const ids = String(wsId).split(',').map(s => s.trim()).filter(Boolean);
+        wsLinks = ids.map(id => `<a href="https://tennet.relaticsonline.com/${id}" target="_blank">${id}</a>`).join('<br>');
+      }
+    }
+    const sc = statusClass(status);
+    return `<tr>
+      <td class="td-id">${jobId}</td>
+      <td>${app}</td>
+      <td>${user}</td>
+      <td><span class="badge-status ${sc}">${status}</span></td>
+      <td class="td-workspace">${wsLinks || '–'}</td>
+      <td>${formatDate(queued)}</td>
+      <td>${formatDate(started)}</td>
+      <td>${formatDate(finished)}</td>
+      <td class="td-duration">${calcDuration(started, finished)}</td>
+      <td>${repo}</td>
+      <td>${workspace}</td>
+    </tr>`;
+  }).join('');
+}
+
+function populateFilters() {
+  const apps       = [...new Set(allJobs.map(j => getField(j, 'sourceName', 'appName', 'workspaceApp')).filter(Boolean))].sort();
+  const users      = [...new Set(allJobs.map(j => getField(j, 'userName', 'submittedBy', 'user')).filter(Boolean))].sort();
+  const repos      = [...new Set(allJobs.map(j => getField(j, 'repository', 'repositoryName')).filter(Boolean))].sort();
+  const workspaces = [...new Set(allJobs.map(j => getField(j, 'workspace', 'workspaceName')).filter(Boolean))].sort();
+  fillSelect('filterApp', apps);
+  fillSelect('filterUser', users);
+  fillSelect('filterRepo', repos);
+  fillSelect('filterWorkspace', workspaces);
+}
+
+function fillSelect(id, values) {
+  const sel = document.getElementById(id);
+  const cur = sel.value;
+  while (sel.options.length > 1) sel.remove(1);
+  values.forEach(v => { const o = new Option(v, v); sel.appendChild(o); });
+  if ([...sel.options].some(o => o.value === cur)) sel.value = cur;
+}
+
+function updateCounts() {
+  const counts = { running: 0, queued: 0, success: 0, failed: 0 };
+  allJobs.forEach(j => {
+    const sc = statusClass(getField(j, 'status', 'jobStatus') || '');
+    if (counts[sc] !== undefined) counts[sc]++;
+    else if (sc === 'aborted') counts.failed++;
+    else counts.queued++;
+  });
+  document.getElementById('cnt-running').textContent = counts.running;
+  document.getElementById('cnt-queued').textContent  = counts.queued;
+  document.getElementById('cnt-success').textContent = counts.success;
+  document.getElementById('cnt-failed').textContent  = counts.failed;
+}
+
+function setSpinner(on) {
+  document.getElementById('spinner').classList.toggle('active', on);
+  document.getElementById('refreshLabel').textContent = on ? 'Ophalen...' : ('Laatste refresh: ' + new Date().toLocaleTimeString('nl-NL'));
+}
+
+function showError(msg) {
+  const bar = document.getElementById('errorBar');
+  bar.textContent = msg;
+  bar.style.display = 'block';
+}
+
+function hideError() { document.getElementById('errorBar').style.display = 'none'; }
+
+function startPolling() {
+  clearInterval(pollTimer);
+  pollTimer = setInterval(fetchJobs, POLL_MS);
+}
+
+document.getElementById('btnRefresh').addEventListener('click', fetchJobs);
+document.getElementById('btnClear').addEventListener('click', () => {
+  ['filterApp','filterUser','filterStatus','filterRepo','filterWorkspace'].forEach(id => document.getElementById(id).value = '');
+  renderTable();
+});
+['filterApp','filterUser','filterStatus','filterRepo','filterWorkspace'].forEach(id =>
+  document.getElementById(id).addEventListener('change', renderTable)
+);
+
+fetchJobs();
+startPolling();
+</script>
+</body>
+</html>

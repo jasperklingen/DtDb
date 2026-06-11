@@ -171,7 +171,8 @@
     </div>
 
     <script>
-        const WEBHOOK_URL_TEMPLATE = 'https://tennet.vicrea.nl/fmedatastreaming/SOV/SOV.fmw?CONFIG_XLSX=$(FME_SHAREDRESOURCE_DATA)%2FSOV%2FConfig%2FSOV.xlsx&SELECTED_GROUP=UUID&COPIES=NUMBEROFCOPIES&HubLaces=&RelaticsWorkspace=RELATICSWORKSPACE&BATCH_SIZE=BatchSize&SHOPPINGCART_UUID=ShoppingCartUuid&token=@Value(FME_SERVER_TOKEN)';
+        const WEBHOOK_URL_TEMPLATE = 'https://tennet.vicrea.nl/fmedatastreaming/SOV/SOV.fmw?CONFIG_XLSX=$(FME_SHAREDRESOURCE_DATA)%2FSOV%2FConfig%2FSOV.xlsx&SELECTED_GROUP=UUID&COPIES=NUMBEROFCOPIES&HubLaces=&RelaticsWorkspace=RELATICSWORKSPACE&BATCH_SIZE=BatchSize&SHOPPINGCART_UUID=ShoppingCartUuid';
+        const FME_TOKEN = '$(FME_SERVER_TOKEN)';
 
         const csvData = `@Value(csv)`; // CSV data comes from FME or backend
 
@@ -384,7 +385,7 @@
                     .replace('UUID', encodeURIComponent(item.id))
                     .replace('RELATICSWORKSPACE', encodeURIComponent('$(RelaticsWorkspace)'))
                     .replace('BatchSize', encodeURIComponent('$(BatchSize)'))
-                    .replace('ShoppingCartUuid',encodeURIComponent('$(SHOPPINGCART_UUID)'))
+                    .replace('ShoppingCartUuid',encodeURIComponent('$(FME_JOB_ID)'))
                     .replace('NUMBEROFCOPIES', encodeURIComponent(String(item.count)));
 
                 // Toon enkel wat er wordt verzonden
@@ -394,7 +395,10 @@
                 webhookList.appendChild(message);
 
                 // Trigger de webhook zonder te wachten op antwoord
-                fetch(url, { method: 'GET' }).catch(err => {
+                fetch(url, {
+                    method: 'GET',
+                    headers: { 'Authorization': `fmetoken token=${FME_TOKEN}` }
+                }).catch(err => {
                     console.warn(`Fout bij verzenden van ${item.label}:`, err);
                 });
             });
