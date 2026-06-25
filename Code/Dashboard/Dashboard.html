@@ -37,7 +37,8 @@
     .stat-dot.running  { background: #0072CE; }
     .stat-dot.queued   { background: #F0A500; }
     .stat-dot.success  { background: #28a745; }
-    .stat-dot.failed   { background: #dc3545; }
+    .stat-dot.failed     { background: #dc3545; }
+    .stat-dot.cancelled  { background: #6f42c1; }
     .stat-label { font-size: 11px; color: #666; }
     .stat-count { font-size: 13px; font-weight: 600; color: #333; }
     .filter-bar {
@@ -69,7 +70,8 @@
     .badge-status.failed   { background: #f8d7da; color: #721c24; }
     .badge-status.running  { background: #cce5ff; color: #004085; }
     .badge-status.queued   { background: #fff3cd; color: #856404; }
-    .badge-status.aborted  { background: #e2e3e5; color: #383d41; }
+    .badge-status.aborted    { background: #e2e3e5; color: #383d41; }
+    .badge-status.cancelled  { background: #e2d9f3; color: #6f42c1; }
     .error-bar { background: #f8d7da; color: #721c24; padding: 8px 20px; font-size: 12px; display: none; }
     td { vertical-align: middle !important; }
     .td-id { font-family: monospace; color: #666; }
@@ -105,6 +107,7 @@
   <div class="stat-item"><div class="stat-dot queued"></div><span class="stat-label">Queued</span><span class="stat-count" id="cnt-queued">–</span></div>
   <div class="stat-item"><div class="stat-dot success"></div><span class="stat-label">Success</span><span class="stat-count" id="cnt-success">–</span></div>
   <div class="stat-item"><div class="stat-dot failed"></div><span class="stat-label">Failed</span><span class="stat-count" id="cnt-failed">–</span></div>
+  <div class="stat-item"><div class="stat-dot cancelled"></div><span class="stat-label">Cancelled</span><span class="stat-count" id="cnt-cancelled">–</span></div>
 </div>
 
 <div class="error-bar" id="errorBar"></div>
@@ -125,8 +128,7 @@
       <option value="SUCCESS">Success</option>
       <option value="FAILURE">Failure</option>
       <option value="RUNNING">Running</option>
-      <option value="FME_FAILURE">FME Failure</option>
-      <option value="ABORTED">Aborted</option>
+      <option value="CANCELLED">Cancelled</option>
     </select>
   </div>
   <div class="form-group">
@@ -220,68 +222,188 @@
 </div>
 
 <script>
-const FME_SERVER = 'https://tennet.vicrea.nl';
-const FME_TOKEN  = 'f6e6ba5acb043d84d95a9290339d53a69516f917';
-const PAGE_SIZE  = 50;
-const POLL_MS    = 300000;
+const FME_SERVER            = 'https://tennet.vicrea.nl';
+const FME_TOKEN             = 'f6e6ba5acb043d84d95a9290339d53a69516f917';
+const PAGE_SIZE             = 50;
+const POLL_MS               = 300000;
+const CACHE_RETENTION_WEEKS = 10;
+// Adjust to match the shared-resource path where Dashboard.html is hosted on FME Flow.
+const CACHE_BASE_URL  = `${FME_SERVER}/fmeapiv4/resources/connections/FME_SHAREDRESOURCE_DASHBOARD`;
+const CACHE_READ_URL  = `${CACHE_BASE_URL}/download?path=/dashboards/jobs-cache.json`;
+const CACHE_WRITE_URL = `${CACHE_BASE_URL}/upload?path=/dashboards&overwrite=true`;
 
 const REPOS_FILTER = ['BulkImportRelatics', 'SOV', 'SOV-ShoppingCart'];
-
-// Groups multiple repositories under a single filter label.
 const REPO_GROUPS = {
   'BulkImportRelatics': ['BulkImportRelatics'],
   'SOV': ['SOV', 'SOV-ShoppingCart']
 };
-const STATUSES = ['success', 'failure', 'running', 'queued'];
+const ACTIVE_STATUSES   = ['running', 'queued'];
+const TERMINAL_STATUSES = ['success', 'failure', 'cancelled'];
 
 let allJobs             = [];
 let allJobsWithChildren = [];
-let serverOffset  = 0;
-let currentPage   = 0;
-let hasMorePages  = false;
+let currentPage    = 0;
 let lastTotalPages = 1;
-let sortCol       = 'queued';
-let sortDir       = 'desc';
-let pollTimer     = null;
+let sortCol        = 'queued';
+let sortDir        = 'desc';
+let pollTimer      = null;
 
-// Fetches one batch of jobs (PAGE_SIZE per status per repo) from the FME API at the current
-// server offset, merges all results, then refreshes the UI from client page 0.
+// Fetches jobs-cache.json, pre-populates jobDetailsCache from stored details, and returns
+// the parsed cache object or null if unavailable/invalid.
+async function loadCache() {
+  try {
+    const res = await fetch(`${CACHE_READ_URL}`, {
+      headers: { 'Authorization': `fmetoken token=${FME_TOKEN}`, 'Accept': 'application/octet-stream' }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!(data.version === 1 && Array.isArray(data.jobs) && data.jobs.length > 0)) return null;
+    // Restore job detail entries so fetchAndUpdateWorkspace skips API calls for known jobs.
+    // JSON object keys are strings; convert back to numbers to match the in-memory Map key type.
+    Object.entries(data.details || {}).forEach(([id, det]) => jobDetailsCache.set(Number(id), det));
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+// Writes the full jobs array plus all known job details to jobs-cache.json.
+// A failed write is non-fatal — the dashboard continues using the in-memory data.
+async function saveCache(jobs) {
+  const blob = new Blob(
+    [JSON.stringify({ version: 1, updatedAt: new Date().toISOString(), jobs, details: Object.fromEntries(jobDetailsCache) })],
+    { type: 'application/json' }
+  );
+  const form = new FormData();
+  form.append('files', blob, 'jobs-cache.json');
+  try {
+    const res = await fetch(CACHE_WRITE_URL, {
+      method: 'POST',
+      headers: { 'Authorization': `fmetoken token=${FME_TOKEN}` },
+      // Content-Type omitted — browser sets multipart/form-data with boundary automatically
+      body: form
+    });
+    if (!res.ok) console.warn('Cache write failed:', res.status, await res.text());
+    return res.ok;
+  } catch(e) {
+    console.warn('Cache write error:', e);
+    return false;
+  }
+}
+
+// Removes jobs older than CACHE_RETENTION_WEEKS from the list.
+function applyRetention(jobs) {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - CACHE_RETENTION_WEEKS * 7);
+  return jobs.filter(j => {
+    const t = getField(j, 'timeStarted', 'startTime', 'timeQueued', 'queueTime');
+    return !t || new Date(t) >= cutoff;
+  });
+}
+
+// Fetches all pages for the given statuses across all repos.
+async function fetchAllForStatuses(statuses) {
+  const tasks = REPOS_FILTER.flatMap(repo =>
+    statuses.map(status => ({ repo, status, offset: 0, done: false }))
+  );
+  const accumulated = [];
+  while (tasks.some(t => !t.done)) {
+    const pending = tasks.filter(t => !t.done);
+    const results = await Promise.all(pending.map(async t => {
+      const url = `${FME_SERVER}/fmeapiv4/jobs?limit=${PAGE_SIZE}&offset=${t.offset}&status=${encodeURIComponent(t.status)}&repository=${encodeURIComponent(t.repo)}`;
+      const res = await fetch(url, {
+        headers: { 'Authorization': `fmetoken token=${FME_TOKEN}`, 'Accept': 'application/json' }
+      });
+      if (!res.ok) { t.done = true; throw new Error(`HTTP ${res.status} ${res.statusText}`); }
+      const data = await res.json();
+      const items = data.items || data || [];
+      if (items.length < PAGE_SIZE) t.done = true;
+      else t.offset += PAGE_SIZE;
+      return items;
+    }));
+    results.forEach(items => accumulated.push(...items));
+  }
+  return accumulated;
+}
+
+// Fetches terminal statuses page by page, stopping each repo/status pair as soon as
+// a page contains a job ID already present in the cache — we've reached known territory.
+async function fetchTerminalIncremental(cachedIdSet) {
+  const tasks = REPOS_FILTER.flatMap(repo =>
+    TERMINAL_STATUSES.map(status => ({ repo, status, offset: 0, done: false }))
+  );
+  const accumulated = [];
+  while (tasks.some(t => !t.done)) {
+    const pending = tasks.filter(t => !t.done);
+    const results = await Promise.all(pending.map(async t => {
+      const url = `${FME_SERVER}/fmeapiv4/jobs?limit=${PAGE_SIZE}&offset=${t.offset}&status=${encodeURIComponent(t.status)}&repository=${encodeURIComponent(t.repo)}`;
+      const res = await fetch(url, {
+        headers: { 'Authorization': `fmetoken token=${FME_TOKEN}`, 'Accept': 'application/json' }
+      });
+      if (!res.ok) { t.done = true; throw new Error(`HTTP ${res.status} ${res.statusText}`); }
+      const data = await res.json();
+      const items = data.items || data || [];
+      if (items.length < PAGE_SIZE || items.some(j => cachedIdSet.has(getField(j, 'id', 'jobId')))) t.done = true;
+      else t.offset += PAGE_SIZE;
+      return items;
+    }));
+    results.forEach(items => accumulated.push(...items));
+  }
+  return accumulated;
+}
+
+// Applies the loaded job list to the UI state and re-renders.
+function applyJobData(jobs) {
+  allJobsWithChildren = jobs;
+  sovChildJobIds.clear();
+  allJobs = allJobsWithChildren.filter(
+    j => isParentJob(j) && !sovChildJobIds.has(getField(j, 'id', 'jobId'))
+  );
+  currentPage = 0;
+  updateCounts();
+  populateFilters();
+  renderTable();
+  prefetchSovCartUuids();
+}
+
+// Incrementally updates the cache on every call (page load, refresh, poll):
+// active statuses are always fully re-fetched; terminal statuses stop as soon as a
+// cached job ID is encountered. Status transitions (running → success) are handled by
+// overlaying fresh terminal results on top of existing cache entries.
 async function fetchJobs() {
   setSpinner(true);
   hideError();
   try {
-    const repoFilter   = document.getElementById('filterRepo').value;
-    const reposToFetch = repoFilter
-      ? (REPO_GROUPS[repoFilter] || [repoFilter])
-      : REPOS_FILTER;
-    const statusesToFetch = (() => {
-      const sf = document.getElementById('filterStatus').value;
-      return sf ? [sf] : STATUSES;
-    })();
+    const cache       = await loadCache();
+    const cached      = cache ? cache.jobs : [];
+    const cachedIdSet = new Set(cached.map(j => getField(j, 'id', 'jobId')));
 
-    const requests = reposToFetch.flatMap(repo =>
-      statusesToFetch.map(status => {
-        const url = `${FME_SERVER}/fmeapiv4/jobs?limit=${PAGE_SIZE}&offset=${serverOffset}&status=${encodeURIComponent(status)}&repository=${encodeURIComponent(repo)}`;
-        return fetch(url, { headers: { 'Authorization': `fmetoken token=${FME_TOKEN}`, 'Accept': 'application/json' } });
-      })
+    const prevActiveIds = new Set(
+      cached
+        .filter(j => ACTIVE_STATUSES.includes((getField(j, 'status', 'jobStatus') || '').toLowerCase()))
+        .map(j => getField(j, 'id', 'jobId'))
     );
-    const responses = await Promise.all(requests);
-    const datasets  = await Promise.all(responses.map(res => {
-      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-      return res.json();
-    }));
-    allJobsWithChildren = datasets.flatMap(data => data.items || data || []);
-    hasMorePages = datasets.some(d => (d.items || d || []).length >= PAGE_SIZE);
-    sovChildJobIds.clear();
-    allJobs = allJobsWithChildren.filter(
-      j => isParentJob(j) && !sovChildJobIds.has(getField(j, 'id', 'jobId'))
+
+    const [freshActive, freshTerminal] = await Promise.all([
+      fetchAllForStatuses(ACTIVE_STATUSES),
+      fetchTerminalIncremental(cachedIdSet)
+    ]);
+
+    // Base: cached minus old active entries (will be replaced by freshActive)
+    const jobMap = new Map(
+      cached.filter(j => !prevActiveIds.has(getField(j, 'id', 'jobId')))
+            .map(j => [getField(j, 'id', 'jobId'), j])
     );
-    currentPage = 0;
-    updateCounts();
-    populateFilters();
-    renderTable();
-    prefetchSovCartUuids();
-    document.getElementById('lastUpdated').textContent = 'Bijgewerkt: ' + new Date().toLocaleTimeString('nl-NL');
+    // Overlay fresh terminal (adds new jobs + updates any that transitioned from active)
+    freshTerminal.forEach(j => jobMap.set(getField(j, 'id', 'jobId'), j));
+    // Overlay fresh active
+    freshActive.forEach(j => jobMap.set(getField(j, 'id', 'jobId'), j));
+
+    const jobs = applyRetention([...jobMap.values()]);
+    await saveCache(jobs);
+    document.getElementById('lastUpdated').textContent =
+      'Bijgewerkt: ' + new Date().toLocaleTimeString('nl-NL');
+    applyJobData(jobs);
   } catch(e) {
     showError('Ophalen mislukt: ' + e.message);
   } finally {
@@ -320,6 +442,7 @@ function statusClass(s) {
   if (l.includes('fail')) return 'failed';
   if (l === 'running' || l === 'processing') return 'running';
   if (l.includes('abort')) return 'aborted';
+  if (l === 'cancelled') return 'cancelled';
   return 'queued';
 }
 
@@ -502,17 +625,23 @@ function getSortValue(j, col) {
   }
 }
 
-// Applies app/user client-side filters and sort, paginates to PAGE_SIZE rows, and renders the
-// current client-side page. Status/repo are handled server-side in fetchJobs.
+// Applies all four client-side filters, sorts, paginates to PAGE_SIZE rows, and renders.
 function renderTable() {
-  const fApp  = document.getElementById('filterApp').value;
-  const fUser = document.getElementById('filterUser').value;
+  const fApp    = document.getElementById('filterApp').value;
+  const fUser   = document.getElementById('filterUser').value;
+  const fStatus = document.getElementById('filterStatus').value;
+  const fRepo   = document.getElementById('filterRepo').value;
+  const reposForFilter = fRepo ? (REPO_GROUPS[fRepo] || [fRepo]) : null;
 
   const filtered = allJobs.filter(j => {
-    const app  = getField(j, 'sourceName', 'appName', 'workspaceApp') || '';
-    const user = getField(j, 'runtimeUserName', 'submittedBy', 'user') || '';
-    return (!fApp  || app === fApp)
-        && (!fUser || user === fUser);
+    const app    = getField(j, 'sourceName', 'appName', 'workspaceApp') || '';
+    const user   = getField(j, 'runtimeUserName', 'submittedBy', 'user') || '';
+    const status = getField(j, 'status', 'jobStatus') || '';
+    const repo   = getField(j, 'repository', 'repositoryName') || '';
+    return (!fApp           || app === fApp)
+        && (!fUser          || user === fUser)
+        && (!fStatus        || status.toUpperCase() === fStatus.toUpperCase())
+        && (!reposForFilter || reposForFilter.includes(repo));
   });
 
   if (sortCol) {
@@ -564,13 +693,11 @@ function renderTable() {
   renderPagination(filtered.length);
 }
 
-// Updates the pagination bar. Prev is disabled only when on page 1 of the first server batch.
-// Next is disabled when on the last client page of the last server batch.
 function renderPagination(total) {
   document.getElementById('pageInfo').textContent =
     total > 0 ? `Pagina ${currentPage + 1} van ${lastTotalPages} (${total} resultaten)` : '';
-  document.getElementById('btnPrev').disabled = currentPage === 0 && serverOffset === 0;
-  document.getElementById('btnNext').disabled = currentPage >= lastTotalPages - 1 && !hasMorePages;
+  document.getElementById('btnPrev').disabled = currentPage === 0;
+  document.getElementById('btnNext').disabled = currentPage >= lastTotalPages - 1;
 }
 
 // Rebuilds the filter dropdowns (app, user, repository) from the current set of loaded jobs,
@@ -594,17 +721,18 @@ function fillSelect(id, values) {
 
 // Counts parent jobs by status category and updates the summary stat bar at the top.
 function updateCounts() {
-  const counts = { running: 0, queued: 0, success: 0, failed: 0 };
+  const counts = { running: 0, queued: 0, success: 0, failed: 0, cancelled: 0 };
   allJobs.forEach(j => {
     const sc = statusClass(getField(j, 'status', 'jobStatus') || '');
     if (counts[sc] !== undefined) counts[sc]++;
     else if (sc === 'aborted') counts.failed++;
     else counts.queued++;
   });
-  document.getElementById('cnt-running').textContent = counts.running;
-  document.getElementById('cnt-queued').textContent  = counts.queued;
-  document.getElementById('cnt-success').textContent = counts.success;
-  document.getElementById('cnt-failed').textContent  = counts.failed;
+  document.getElementById('cnt-running').textContent   = counts.running;
+  document.getElementById('cnt-queued').textContent    = counts.queued;
+  document.getElementById('cnt-success').textContent   = counts.success;
+  document.getElementById('cnt-failed').textContent    = counts.failed;
+  document.getElementById('cnt-cancelled').textContent = counts.cancelled;
 }
 
 // Shows or hides the loading spinner and updates the last-refresh label accordingly.
@@ -623,33 +751,26 @@ function showError(msg) {
 // Hides the error bar.
 function hideError() { document.getElementById('errorBar').style.display = 'none'; }
 
-// Starts (or restarts) the auto-refresh interval that re-fetches jobs every POLL_MS milliseconds.
 function startPolling() {
   clearInterval(pollTimer);
   pollTimer = setInterval(fetchJobs, POLL_MS);
 }
 
+// All four filters are now client-side — changing any of them just re-renders.
 document.getElementById('btnRefresh').addEventListener('click', fetchJobs);
 document.getElementById('btnClear').addEventListener('click', () => {
   ['filterApp','filterUser','filterStatus','filterRepo'].forEach(id => document.getElementById(id).value = '');
-  serverOffset = 0;
-  fetchJobs();
+  currentPage = 0;
+  renderTable();
 });
-// Status and repo filters are applied server-side — reload from offset 0.
-['filterStatus','filterRepo'].forEach(id =>
-  document.getElementById(id).addEventListener('change', () => { serverOffset = 0; fetchJobs(); })
-);
-// App and user filters are applied client-side on the loaded page.
-['filterApp','filterUser'].forEach(id =>
+['filterApp','filterUser','filterStatus','filterRepo'].forEach(id =>
   document.getElementById(id).addEventListener('change', () => { currentPage = 0; renderTable(); })
 );
 document.getElementById('btnPrev').addEventListener('click', () => {
   if (currentPage > 0) { currentPage--; renderTable(); }
-  else if (serverOffset > 0) { serverOffset -= PAGE_SIZE; fetchJobs(); }
 });
 document.getElementById('btnNext').addEventListener('click', () => {
   if (currentPage < lastTotalPages - 1) { currentPage++; renderTable(); }
-  else if (hasMorePages) { serverOffset += PAGE_SIZE; fetchJobs(); }
 });
 
 document.querySelectorAll('#jobsTable thead th[data-col]').forEach(th => {
