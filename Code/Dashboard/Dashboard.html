@@ -376,7 +376,6 @@ async function fetchJobs() {
   try {
     const cache       = await loadCache();
     const cached      = cache ? cache.jobs : [];
-    const cachedIdSet = new Set(cached.map(j => getField(j, 'id', 'jobId')));
 
     const prevActiveIds = new Set(
       cached
@@ -384,9 +383,19 @@ async function fetchJobs() {
         .map(j => getField(j, 'id', 'jobId'))
     );
 
+    // Only stop the terminal fetch when we hit a job already in a terminal state in the cache.
+    // Using all cached IDs (including active ones) caused jobs transitioning from running → success
+    // to be dropped: they were removed from the base but the stop fired before the terminal fetch
+    // reached them in their new status.
+    const cachedTerminalIdSet = new Set(
+      cached
+        .filter(j => !prevActiveIds.has(getField(j, 'id', 'jobId')))
+        .map(j => getField(j, 'id', 'jobId'))
+    );
+
     const [freshActive, freshTerminal] = await Promise.all([
       fetchAllForStatuses(ACTIVE_STATUSES),
-      fetchTerminalIncremental(cachedIdSet)
+      fetchTerminalIncremental(cachedTerminalIdSet)
     ]);
 
     // Base: cached minus old active entries (will be replaced by freshActive)

@@ -1,0 +1,313 @@
+<mxfile host="app.diagrams.net" pages="2">
+  <diagram id="d1" name="System Overview">
+    <mxGraphModel dx="1144" dy="586" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="p1n1" parent="1" style="shape=mxgraph.flowchart.document;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;" value="IC_Reader_Tool_Config_v5.xlsx&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Query definitions &amp; report text&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="220" x="440" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p1n2" parent="1" style="shape=mxgraph.flowchart.document;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;" value="InformationContainer&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;.ttl or .zip of .ttl files&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="220" x="760" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p1n3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" value="&lt;b&gt;IC_Reader_Tool.fmw&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px;&quot;&gt;Filters queries by Category · converts IC to combined RDF ·&lt;br&gt;uploads to Laces · runs SPARQL · builds HTML report ·&lt;br&gt;computes MD5 hashes · deletes temp publication&lt;/font&gt;" vertex="1">
+          <mxGeometry height="90" width="610" x="280" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="p1n0" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;dashed=1;" value="Published parameters&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Category · AUTH_USERNAME/PASSWORD ·&lt;br&gt;LACES_REPO · LACES_BASE_URL · OUT_HTML&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="220" x="20" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="p1n4" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1;" value="Laces&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;$(LACES_BASE_URL) / $(LACES_REPO)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="100" width="180" x="960" y="185" as="geometry" />
+        </mxCell>
+        <mxCell id="p1n5" parent="1" style="shape=mxgraph.flowchart.document;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#333333;fontSize=11;" value="$(OUT_HTML)&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Validation / statistics report&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="240" x="280" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="p1n6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8eedc;strokeColor=#b87820;fontSize=10;dashed=1;align=left;spacingLeft=8;" value="MD5 hash footer&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;firsthash = MD5(date+filename)&lt;br&gt;secondhash = MD5(query results+date+filename)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="290" x="600" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="p1n7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" value="&lt;b&gt;HashVerifier.html&lt;/b&gt; (standalone, offline)&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Recomputes firsthash / secondhash client-side (pure-JS MD5)&lt;br&gt;so a reviewer can confirm a report wasn&#39;t altered, without FME access&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="510" x="330" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="p1e1" edge="1" parent="1" source="p1n1" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;fontSize=10;fontStyle=2;                  exitX=0.5;exitY=1;exitDx=0;exitDy=0;                  entryX=0.35;entryY=0;entryDx=0;entryDy=0;" target="p1n3" value="reads config">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1e2" edge="1" parent="1" source="p1n2" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;fontSize=10;fontStyle=2;                  exitX=0.5;exitY=1;exitDx=0;exitDy=0;                  entryX=0.65;entryY=0;entryDx=0;entryDy=0;" target="p1n3" value="reads IC file">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1e0" edge="1" parent="1" source="p1n0" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;                  exitX=1;exitY=0.5;exitDx=0;exitDy=0;                  entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="p1n3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1e3" edge="1" parent="1" source="p1n3" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;fontStyle=2;endArrow=block;startArrow=block;                  exitX=1;exitY=0.5;exitDx=0;exitDy=0;                  entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="p1n4" value="① POST /publications (upload Turtle + metadata)&lt;br&gt;② POST @Value(LacesUri)/sparql (per query, TSV)&lt;br&gt;③ DELETE /publications/{id} (cleanup)">
+          <mxGeometry relative="1" x="-1" y="21" as="geometry">
+            <mxPoint x="-20" y="16" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1e4" edge="1" parent="1" source="p1n3" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;fontStyle=2;                  exitX=0.35;exitY=1;exitDx=0;exitDy=0;                  entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="p1n5" value="HTML Writer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1e5" edge="1" parent="1" source="p1n3" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;fontSize=10;fontStyle=2;                  exitX=0.65;exitY=1;exitDx=0;exitDy=0;                  entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="p1n6" value="computed &amp; appended">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1e6" edge="1" parent="1" source="p1n5" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;fontSize=10;fontStyle=2;                  exitX=0.5;exitY=1;exitDx=0;exitDy=0;                  entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="p1n7" value="manual verification">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="d2" name="Transformer Pipeline">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- ══════════════════════════════════
+             STAGE 1 — Excel Config
+             ══════════════════════════════════ -->
+        <mxCell id="s1" value="1 · Excel Config" style="swimlane;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="1120" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="s1t1" value="XLSXR Reader&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;reads IC_Reader_Tool_Config_v5.xlsx&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="s1">
+          <mxGeometry x="20" y="45" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="s1out" value="→ &lt;b&gt;Query, QueryTitle, Explanation,&lt;br&gt;Order, Category, Headers, Type&lt;/b&gt; per row" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=2;" vertex="1" parent="s1">
+          <mxGeometry x="320" y="45" width="420" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="s1e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s1t1" target="s1out" parent="s1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- ══════════════════════════════════
+             STAGE 2 — VS selection
+             ══════════════════════════════════ -->
+        <mxCell id="s2" value="2 · VS selection (Category filter)" style="swimlane;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="1120" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="s2t1" value="NullAttributeMapper&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;Category: null/blank → 0&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="s2">
+          <mxGeometry x="20" y="45" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s2t2" value="Tester &quot;T_Catagory_Selection&quot;&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;PASS if Category=$(Category)&lt;br&gt;OR Category=0 OR $(Category)=0&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="s2">
+          <mxGeometry x="290" y="35" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s2t3" value="NullAttributeMapper&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;Headers: blank → &quot;Misc&quot;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="s2">
+          <mxGeometry x="670" y="45" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s2out" value="→ filtered query rows" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=2;" vertex="1" parent="s2">
+          <mxGeometry x="930" y="55" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s2e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s2t1" target="s2t2" parent="s2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s2e2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s2t2" target="s2t3" parent="s2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- ══════════════════════════════════
+             STAGE 3 — TTL to hub.laces
+             ══════════════════════════════════ -->
+        <mxCell id="s3" value="3 · TTL to hub.laces (upload)" style="swimlane;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="380" width="1120" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="s3t1" value="Creator +&lt;br&gt;AttributeCreator&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;IC path&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s3">
+          <mxGeometry x="20" y="45" width="110" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s3t2" value="PythonCaller&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;.ttl → parse directly&lt;br&gt;.zip → extract, parse all .ttl&lt;br&gt;merge via rdflib.Graph&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s3">
+          <mxGeometry x="150" y="35" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s3t3" value="TempPathnameCreator +&lt;br&gt;AttributeFileWriter&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;write combined graph&lt;br&gt;as .ttl to temp file&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s3">
+          <mxGeometry x="370" y="35" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s3t4" value="AttributeCreator_25&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;build metadataJSON&lt;br&gt;(owner: TenneT,&lt;br&gt;publisher: FME)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s3">
+          <mxGeometry x="570" y="35" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s3t5" value="HTTPCaller_5&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;POST multipart/form-data&lt;br&gt;/repositories/{repo}/publications&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" vertex="1" parent="s3">
+          <mxGeometry x="770" y="35" width="210" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s3t6" value="JSONExtractor&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;publication_id ← $.id&lt;br&gt;uri ← $.uri&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s3">
+          <mxGeometry x="1000" y="35" width="100" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s3out" value="→ &lt;b&gt;LacesPublication, LacesUri&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;" vertex="1" parent="s3">
+          <mxGeometry x="770" y="130" width="330" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="s3e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s3t1" target="s3t2" parent="s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s3e2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s3t2" target="s3t3" parent="s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s3e3" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s3t3" target="s3t4" parent="s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s3e4" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s3t4" target="s3t5" parent="s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s3e5" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s3t5" target="s3t6" parent="s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- ══════════════════════════════════
+             STAGE 4 — Run SPARQL
+             ══════════════════════════════════ -->
+        <mxCell id="s4" value="4 · Run SPARQL" style="swimlane;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="580" width="1120" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="s4t1" value="FeatureMerger&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;attach LacesPublication /&lt;br&gt;LacesUri to each query row&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="s4">
+          <mxGeometry x="20" y="40" width="260" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s4t2" value="HTTPCaller_6&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;POST @Value(Query) to&lt;br&gt;@Value(LacesUri)/sparql&lt;br&gt;Accept: text/tab-separated-values&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="s4">
+          <mxGeometry x="320" y="30" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="s4t3" value="StringReplacer × 2&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;escape &amp;amp; and &amp;lt;&lt;br&gt;in _response_body&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="s4">
+          <mxGeometry x="640" y="40" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s4out" value="→ per-query TSV results" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=2;" vertex="1" parent="s4">
+          <mxGeometry x="900" y="55" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s4e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s4t1" target="s4t2" parent="s4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s4e2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s4t2" target="s4t3" parent="s4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- ══════════════════════════════════
+             STAGE 5 — Create hash of filename + date
+             ══════════════════════════════════ -->
+        <mxCell id="s5" value="5 · Create hash of Filename + date as string" style="swimlane;startSize=30;fillColor=#f2d6d0;strokeColor=#ae6d5c;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="760" width="1120" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="s5t1" value="AttributeExposer&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;extract input filename&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="s5">
+          <mxGeometry x="20" y="45" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s5t2" value="AttributeCreator&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;+ current date&lt;br&gt;→ &lt;b&gt;datefilename&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="s5">
+          <mxGeometry x="290" y="40" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s5t3" value="CRCCalculator&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;MD5(datefilename)&lt;br&gt;→ &lt;b&gt;firsthash&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="s5">
+          <mxGeometry x="560" y="40" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s5e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s5t1" target="s5t2" parent="s5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s5e2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s5t2" target="s5t3" parent="s5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- ══════════════════════════════════
+             STAGE 6 — Create hash of filename + date + response bodies
+             ══════════════════════════════════ -->
+        <mxCell id="s6" value="6 · Create hash of filename + date + response bodies of all query&#39;s" style="swimlane;startSize=30;fillColor=#cfe0f5;strokeColor=#5c85ae;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="940" width="1120" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="s6t1" value="AttributeRenamer&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;datefilename → _response_body&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s6">
+          <mxGeometry x="20" y="45" width="230" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s6t2" value="Sorter&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;by Order;&lt;br&gt;normalize line endings&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s6">
+          <mxGeometry x="290" y="40" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s6t3" value="Aggregator&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;concatenate all&lt;br&gt;response bodies&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s6">
+          <mxGeometry x="530" y="40" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s6t4" value="CRCCalculator_2&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;MD5(concatenation)&lt;br&gt;→ &lt;b&gt;secondhash&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s6">
+          <mxGeometry x="760" y="40" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s6e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s6t1" target="s6t2" parent="s6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s6e2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s6t2" target="s6t3" parent="s6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s6e3" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s6t3" target="s6t4" parent="s6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- ══════════════════════════════════
+             STAGE 7 — Make Hash footer
+             ══════════════════════════════════ -->
+        <mxCell id="s7" value="7 · Make Hash footer" style="swimlane;startSize=30;fillColor=#dde0f5;strokeColor=#8085ae;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1120" width="1120" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="s7t1" value="Aggregator_2&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;combine firsthash +&lt;br&gt;secondhash on one feature&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="s7">
+          <mxGeometry x="20" y="35" width="250" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s7t2" value="HTMLReportGenerator_3&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;render hash values&lt;br&gt;as HTML fragment&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="s7">
+          <mxGeometry x="310" y="35" width="250" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s7out" value="→ hash footer fragment&lt;br&gt;(picked up by injected JS/CSS in stage 8)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=2;" vertex="1" parent="s7">
+          <mxGeometry x="600" y="45" width="450" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s7e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s7t1" target="s7t2" parent="s7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- ══════════════════════════════════
+             STAGE 8 — Validation HTML (final assembly)
+             ══════════════════════════════════ -->
+        <mxCell id="s8" value="8 · Validation HTML (final assembly)" style="swimlane;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1290" width="1120" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="s8t1" value="HTMLReportGenerator_2&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;report header&lt;br&gt;(IC filename, Category)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s8">
+          <mxGeometry x="20" y="35" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s8t2" value="HTMLReportGenerator&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;per-query section&lt;br&gt;(title, explanation, TSV table)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s8">
+          <mxGeometry x="20" y="130" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s8t3" value="Sorter&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;by Order&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s8">
+          <mxGeometry x="270" y="75" width="150" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s8t4" value="HTMLLayouter&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;assemble page&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s8">
+          <mxGeometry x="460" y="75" width="150" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s8t5" value="StringReplacer&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;inject CSS/JS&lt;br&gt;(styled tables, tabs, footer)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s8">
+          <mxGeometry x="650" y="75" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s8t6" value="HTML Writer&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;→ $(OUT_HTML)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="s8">
+          <mxGeometry x="900" y="35" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="s8t7" value="HTTPCaller_2&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;DELETE /publications/{id}&lt;br&gt;(remove temp publication)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" vertex="1" parent="s8">
+          <mxGeometry x="900" y="115" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s8e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s8t1" target="s8t3" parent="s8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s8e2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s8t2" target="s8t3" parent="s8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s8e3" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s8t3" target="s8t4" parent="s8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s8e4" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s8t4" target="s8t5" parent="s8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s8e5" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s8t5" target="s8t6" parent="s8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s8e6" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s8t5" target="s8t7" parent="s8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- ══════════════════════════════════
+             Inter-stage arrows
+             ══════════════════════════════════ -->
+        <mxCell id="ie1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s1" target="s2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ie2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s2" target="s3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ie3" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s3" target="s4" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ie4" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s4" target="s5" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ie5" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s5" target="s6" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ie6" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s6" target="s7" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ie7" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s7" target="s8" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ie8" value="TSV results feed report sections" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;fontSize=9;fontStyle=2;curved=1;                  exitX=0;exitY=0.5;exitDx=0;exitDy=0;                  entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="s4" target="s8" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="10" y="655" />
+              <mxPoint x="10" y="1330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

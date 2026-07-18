@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Report</title>
+      <meta charset="UTF-8">
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" rel="stylesheet">
+     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font-ui:   'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  --page:   #edf1f7;
+  --card:   #ffffff;
+  --border: #b8c4d4;
+
+  --text-primary: #080e18;
+  --text-muted:   #5a6878;
+
+  --accent-blue: #1848a0;
+  --accent-cyan: #0a7a8e;
+
+  --hover:  #eef2fb;
+  --stripe: #f4f7fc;
+  --radius: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page:   #080c14;
+    --card:   #101624;
+    --border: #1e2d45;
+
+    --text-primary: #dce8f8;
+    --text-muted:   #384860;
+
+    --accent-blue: #3a78e8;
+    --accent-cyan: #20d8a0;
+
+    --hover:  #141e30;
+    --stripe: #0c1220;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--page);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── Page header ── */
+.rpt-header {
+  background: var(--card);
+  padding: 24px 40px 20px;
+  border-top: 3px solid var(--accent-blue);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.rpt-header-logo {
+  height: 36px;
+  width: auto;
+  flex-shrink: 0;
+}
+.rpt-header-title {
+  color: var(--text-primary);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.rpt-header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.rpt-header-sub {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+.rpt-header-badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--note-bg);
+  color: var(--accent-blue);
+  border: 0.5px solid var(--border);
+}
+
+/* ── Page content ── */
+.rpt-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 32px 24px 56px;
+}
+
+/* ── Section label ── */
+.group-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  margin: 32px 0 16px;
+}
+.group-label:first-of-type { margin-top: 0; }
+
+/* ── Stat grid ── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* ── Stat card ── */
+.stat-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 0.5px solid var(--border);
+  border-left: 4px solid var(--accent-blue);
+  padding: 18px 20px 16px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.09);
+}
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 2.2rem;
+  font-weight: 500;
+  color: var(--accent-blue);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+  margin-top: 4px;
+}
+.stat-query {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Table card ── */
+.table-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 0.5px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.table-card-header {
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.table-card-qname {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent-cyan);
+  margin-bottom: 3px;
+}
+.table-card-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ── Tables ── */
+.tbl-wrap { overflow-x: auto; }
+.sparql-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.sparql-table thead th {
+  background: var(--accent-blue);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--accent-cyan);
+}
+.sparql-table thead th:first-child { border-left: 4px solid var(--accent-cyan); }
+.sparql-table tbody td {
+  padding: 8px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+.sparql-table tbody td:first-child {
+  font-weight: 500;
+  border-left: 4px solid transparent;
+}
+.sparql-table tbody tr:nth-child(even) td { background: var(--stripe); }
+.sparql-table tbody tr:hover td { background: var(--hover); }
+.sparql-table tbody tr:last-child td { border-bottom: none; }
+.sparql-table a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.78em;
+  word-break: break-all;
+}
+.sparql-table a:hover { text-decoration: underline; }
+.tbl-row-count {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  padding: 7px 14px;
+  background: var(--stripe);
+  border-top: 1px solid var(--border);
+}
+
+/* ── Footer ── */
+.rpt-footer {
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  padding: 14px 40px;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.rpt-footer-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.rpt-footer-hash {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  /* ── STEP 1: TSV → tables ── */
+  document.querySelectorAll('pre.tsv-data').forEach(block => {
+    const raw = block.innerText.trim();
+    if (!raw) return;
+    const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+    if (!lines.length) return;
+
+    const table = document.createElement('table');
+    table.className = 'sparql-table';
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+
+    lines.forEach((line, i) => {
+      const cols = line.split('\t');
+      const tr = document.createElement('tr');
+      cols.forEach(col => {
+        const cell = document.createElement(i === 0 ? 'th' : 'td');
+        const val = col.trim();
+        if (val.startsWith('<') && val.endsWith('>')) {
+          const url = val.slice(1, -1);
+          const a = document.createElement('a');
+          a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+          a.textContent = url;
+          cell.appendChild(a);
+        } else {
+          cell.textContent = val;
+        }
+        tr.appendChild(cell);
+      });
+      if (i === 0) thead.appendChild(tr); else tbody.appendChild(tr);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    block.replaceWith(table);
+  });
+
+  /* ── STEP 2: Restructure page ── */
+  const bodyDivs = Array.from(document.querySelectorAll('body > div'));
+  if (bodyDivs.length < 2) return;
+
+  const h1Text  = bodyDivs[0].querySelector('h1,H1')?.textContent.trim() || 'Report';
+  const h6Nodes = Array.from(bodyDivs[0].querySelectorAll('h6,H6'));
+
+  /* First H6 = container subtitle; any additional H6s become badges (e.g. "VS: 1") */
+  const subtitleText = h6Nodes[0]?.textContent.trim() || '';
+  const badgeTexts   = h6Nodes.slice(1).map(n => n.textContent.trim()).filter(Boolean);
+
+  /* A trailing div holding only bare MD5 hashes (no heading) is a footer payload, not a section */
+  const isHashDiv = div => {
+    if (div.querySelector('h3,H3')) return false;
+    const ps = Array.from(div.querySelectorAll('p'));
+    return ps.length > 0 && ps.every(p => /^[a-f0-9]{32}$/i.test(p.textContent.trim()));
+  };
+
+  const contentDivs = bodyDivs.slice(1);
+  const hashDivs    = contentDivs.filter(isHashDiv);
+  const sectionDivs = contentDivs.filter(div => !isHashDiv(div));
+  const hashValues  = hashDivs.flatMap(div =>
+    Array.from(div.querySelectorAll('p')).map(p => p.textContent.trim())
+  );
+
+  /* Parse sections */
+  const sections = sectionDivs.map(div => {
+    const queryName   = div.querySelector('h3,H3')?.textContent.trim() || '';
+    const description = div.querySelector('p')?.textContent.trim() || '';
+    const table       = div.querySelector('table.sparql-table');
+
+    let kind = 'unknown', value = null;
+    if (table) {
+      const cols = table.querySelectorAll('thead th').length;
+      const rows = table.querySelectorAll('tbody tr').length;
+      if (cols === 1 && rows === 1) {
+        kind  = 'stat';
+        value = table.querySelector('tbody td')?.textContent.trim() || '—';
+      } else {
+        kind = 'table';
+      }
+    }
+
+    const group = div.querySelector('div[class]')?.getAttribute('class')?.trim() || 'Other';
+
+    return { queryName, description, table, kind, value, group };
+  });
+
+  /* Collect groups in first-appearance order */
+  const groupOrder = [];
+  const grouped    = {};
+  sections.forEach(s => {
+    if (!grouped[s.group]) { grouped[s.group] = []; groupOrder.push(s.group); }
+    grouped[s.group].push(s);
+  });
+
+  /* ── Build new DOM ── */
+  const frag = document.createDocumentFragment();
+
+  /* Header */
+  const header = document.createElement('div');
+  header.className = 'rpt-header';
+  header.innerHTML = `
+    <div>
+      <div class="rpt-header-title">${h1Text}</div>
+      <div class="rpt-header-meta">
+        ${subtitleText ? `<div class="rpt-header-sub">${subtitleText}</div>` : ''}
+        ${badgeTexts.map(b => `<span class="rpt-header-badge">${b}</span>`).join('')}
+      </div>
+    </div>
+    <img class="rpt-header-logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTU0cHgiIGhlaWdodD0iMjlweCIgdmlld0JveD0iMCAwIDE1NCAyOSIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogICAgPHRpdGxlPmxvZ288L3RpdGxlPgogICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9ImxvZ28iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMjg0LCAwLjAwMDExNikiIGZpbGwtcnVsZT0ibm9uemVybyI+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik00MC43MTg3MTU4LDkuMDg0ODgzNzMgQzQyLjcwNTcxNTgsMTYuNTExODgzNyAzNS4yNzg3MTU4LDI0Ljk1NDg4MzcgMjQuMTMwNzE1OCwyNy45NDY4ODM3IEMxMi45Nzk3MTU4LDMwLjkzNzg4MzcgMi4zMTI3MTU4LDI3LjMzOTg4MzcgMC4zMjI3MTU3OTgsMTkuOTEzODgzNyBDLTEuNjY4Mjg0MiwxMi40ODY4ODM3IDUuNzU5NzE1OCw0LjAzOTg4MzczIDE2LjkwOTcxNTgsMS4wNTE4ODM3MyBDMjguMDU4NzE1OCwtMS45MzYxMTYyNyAzOC43MjM3MTU4LDEuNjU4ODgzNzMgNDAuNzE0NzE1OCw5LjA4NDg4MzczIiBpZD0iUGF0aCIgZmlsbD0iI0ZGRkZGRiI+PC9wYXRoPgogICAgICAgICAgICA8cGF0aCBkPSJNNDAuNzM3NzE1OCwxMy45OTg4ODM3IEwxOC43NTk3MTU4LDEzLjk5ODg4MzcgTDI3LjAxNTcxNTgsNy44MDE4ODM3MyBMMS41NTQ3MTU4LDExLjgxOTg4MzcgQzQuMTQ1NzE1OCw3LjEyNjg4MzczIDkuNzY2NzE1OCwyLjk2OTg4MzczIDE2LjkxODcxNTgsMS4wNTQ4ODM3MyBDMjguMDY4NzE1OCwtMS45MzcxMTYyNyAzOC43MzM3MTU4LDEuNjYwODgzNzMgNDAuNzIzNzE1OCw5LjA4Nzg4MzczIEM0MS4xNDU3MTU4LDEwLjY5Nzg4MzcgNDEuMTUzNzE1OCwxMi4zODc4ODM3IDQwLjc0NTcxNTgsMTQuMDAxODgzNyBMNDAuNzM3NzE1OCwxMy45OTg4ODM3IFoiIGlkPSJQYXRoIiBmaWxsPSIjMDE0Njk0Ij48L3BhdGg+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0xMi41NTk3MTU4LDI4LjcyOTg4MzcgQzYuMzczNzE1OCwyNy44MTk4ODM3IDEuNTgxNzE1OCwyNC42NDk4ODM3IDAuMzIyNzE1Nzk4LDE5LjkxMzg4MzcgQy0wLjE3ODYwNTc0MSwxNy45NTkyMTk2IC0wLjA4Mzg4MDMwODEsMTUuODk5Mjg5NiAwLjU5NDcxNTc5OCwxMy45OTg4ODM3IEwxMi41NTk3MTU4LDEzLjk5ODg4MzcgTDEyLjU1OTcxNTgsMjguNzI4ODgzNyBMMTIuNTU5NzE1OCwyOC43Mjk4ODM3IFoiIGlkPSJQYXRoIiBmaWxsPSIjNkVBNEMzIj48L3BhdGg+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0xNi4zMjU3MTU4LDI2LjE1MTg4MzcgQzE2LjU5MjcxNTgsMjUuOTY2ODgzNyAxNi44OTQ3MTU4LDI1LjgzNjg4MzcgMTcuMjEyNzE1OCwyNS43NzA4ODM3IEwzMS4zMDM3MTU4LDIzLjMyMzg4MzcgQzMxLjc5NTM5MjMsMjMuMjI0OTM1MyAzMi4yNTk1MzQ4LDIzLjAxOTgyNTMgMzIuNjYzNzE1OCwyMi43MjI4ODM3IEwzMy4yMDc3MTU4LDIyLjI2NTg4MzcgTDE0LjYzNDcxNTgsMjIuMjY1ODgzNyBMMTkuNzAyNzE1OCwxOC40NTg4ODM3IEMxOS45Njg3MTU4LDE4LjI3Mjg4MzcgMjAuMjY5NzE1OCwxOC4xNDM4ODM3IDIwLjU4NjcxNTgsMTguMDgwODgzNyBMMzkuNjY4NzE1OCwxNC45NzE4ODM3IEMzOS45NzQ3MTU4LDE0LjkxNzg4MzcgNDAuMjcyNzE1OCwxNC44MjE4ODM3IDQwLjU1MjcxNTgsMTQuNjg2ODgzNyBDMzguODA5NzE1OCwyMC4zNTY4ODM3IDMyLjUxOTcxNTgsMjUuNzAyODgzNyAyNC4xMTk3MTU4LDI3Ljk1NDg4MzcgQzIwLjQ0OTc4ODEsMjguOTY1MDEgMTYuNjE2ODE4MSwyOS4yNDIyODg3IDEyLjgzOTcxNTgsMjguNzcwODgzNyBMMTYuMzI1NzE1OCwyNi4xNTA4ODM3IEwxNi4zMjU3MTU4LDI2LjE1MTg4MzcgWiIgaWQ9IlBhdGgiIGZpbGw9IiM1MkFFMzIiPjwvcGF0aD4KICAgICAgICAgICAgPHBhdGggZD0iTTEzNS40NDI3MTYsNS4zMjY4ODM3MyBDMTM2LjQ4OTM1LDUuODk0NjM2NTYgMTM3LjMxNTY0MSw2Ljc5NjYyMDE3IDEzNy43ODk3MTYsNy44ODg4ODM3MyBMMTQzLjI2MzcxNiw3Ljg4ODg4MzczIEwxNDMuMjYzNzE2LDIyLjk5NDg4MzcgTDE0Ny40OTI3MTYsMjIuOTk0ODgzNyBMMTQ3LjQ5MjcxNiw3Ljg4ODg4MzczIEwxNTMuNTQyNzE2LDcuODg4ODgzNzMgTDE1My41NDI3MTYsNS4zMjY4ODM3MyBMMTM1LjQ0MjcxNiw1LjMyNjg4MzczIEwxMzUuNDQyNzE2LDUuMzI2ODgzNzMgWiBNODkuOTc0NzE1OCw1LjMxMzg4MzczIEw4My45OTI3MTU4LDUuMzEzODgzNzMgQzgxLjg2MjcxNTgsNS4zMTM4ODM3MyA4MC44NDI3MTU4LDYuMzM1ODgzNzMgODAuODQyNzE1OCw4LjQwNzg4MzczIEw4MC44NDI3MTU4LDIyLjk5NDg4MzcgTDg0Ljk2MjcxNTgsMjIuOTk0ODgzNyBMODQuOTYyNzE1OCw4Ljc0Nzg4MzczIEM4NC45ODQ3MTU4LDguMTQxODgzNzMgODUuMTk5NzE1OCw3LjkzMTg4MzczIDg1LjgwMjcxNTgsNy45MDQ4ODM3MyBMODkuMzExNzE1OCw3LjkwNDg4MzczIEM5MS44NzA3MTU4LDcuOTI5ODgzNzMgOTIuNzgxNzE1OCw5LjE3MTg4MzczIDkyLjgwNTcxNTgsMTEuNzYzODgzNyBMOTIuODA1NzE1OCwyMi45OTM4ODM3IEw5Ni45MjU3MTU4LDIyLjk5Mzg4MzcgTDk2LjkyNTcxNTgsMTEuMzkxODgzNyBDOTYuOTI1NzE1OCw2LjI2NTg4MzczIDkzLjQ1MDcxNTgsNS4zMzA4ODM3MyA4OS45NjY3MTU4LDUuMzE0ODgzNzMgTTEwOS4zNzY3MTYsNS4zMTI4ODM3MyBMMTAzLjQxNjcxNiw1LjMxMjg4MzczIEMxMDEuMjg5NzE2LDUuMzEyODgzNzMgMTAwLjI2NzcxNiw2LjMzNDg4MzczIDEwMC4yNjc3MTYsOC40MDc4ODM3MyBMMTAwLjI2NzcxNiwyMi45OTM4ODM3IEwxMDQuMzg2NzE2LDIyLjk5Mzg4MzcgTDEwNC4zODY3MTYsOC43NDY4ODM3MyBDMTA0LjQwNTcxNiw4LjE0MDg4MzczIDEwNC42MjM3MTYsNy45MzE4ODM3MyAxMDUuMjI3NzE2LDcuOTAzODgzNzMgTDEwOC43MTg3MTYsNy45MDM4ODM3MyBDMTExLjI4MDcxNiw3LjkyODg4MzczIDExMi4xOTE3MTYsOS4xNzE4ODM3MyAxMTIuMjE4NzE2LDExLjc2Mzg4MzcgTDExMi4yMTg3MTYsMjIuOTkzODgzNyBMMTE2LjMzNTcxNiwyMi45OTM4ODM3IEwxMTYuMzM1NzE2LDExLjM5MDg4MzcgQzExNi4zMzU3MTYsNi4yNjQ4ODM3MyAxMTIuODYwNzE2LDUuMzI4ODgzNzMgMTA5LjM3NjcxNiw1LjMxMjg4MzczIFogTTY1LjIyNDcxNTgsMTYuMjYzODgzNyBDNjUuMjA0NzE1OCwxNi4wMTY4ODM3IDY1LjE5MTcxNTgsMTUuODUwODgzNyA2NS4xODQ3MTU4LDE1LjU2MTg4MzcgTDc0LjQ5OTcxNTgsMTUuNTYxODgzNyBDNzUuMDAxNDU2OCwxNS41ODM3Mzc2IDc1LjUwNDA1MTcsMTUuNTQ4MTczNSA3NS45OTc3MTU4LDE1LjQ1NTg4MzcgQzc2Ljk0NzcxNTgsMTUuMjEzODgzNyA3Ny45Njk3MTU4LDE0LjQ2Mzg4MzcgNzcuOTcxNzE1OCwxMi4xNDM4ODM3IEM3Ny45NzE3MTU4LDkuMzMxODgzNzMgNzcuMDIwNzE1OCw3LjY0Mzg4MzczIDc1LjUxMTcxNTgsNi41NzQ4ODM3MyBDNzIuNDM3NzE1OCw0LjM5ODg4MzczIDY1Ljc0MDcxNTgsNC4zOTg4ODM3MyA2Mi45ODU3MTU4LDcuMjUxODgzNzMgQzYwLjIzMDcxNTgsMTAuMTA0ODgzNyA2MC41Mzc3MTU4LDE2Ljg3Mjg4MzcgNjEuOTk4NzE1OCwxOS43ODE4ODM3IEM2Mi41NTYyMjc4LDIwLjg1MDA3OTUgNjMuNDMyNDI3MiwyMS43MTgyNDAzIDY0LjUwNTcxNTgsMjIuMjY1ODgzNyBDNjUuNDQwNzE1OCwyMi43OTA4ODM3IDY2LjgwODcxNTgsMjIuOTk0ODgzNyA2OC4xMzM3MTU4LDIyLjk5NDg4MzcgTDc3LjQxMzcxNTgsMjIuOTk0ODgzNyBMNzcuNDEzNzE1OCwyMC40MjQ4ODM3IEw2OC43ODM3MTU4LDIwLjQyNDg4MzcgQzY1Ljk5MDcxNTgsMjAuNDAyODgzNyA2NS4zNTY3MTU4LDE4LjMzMzg4MzcgNjUuMjIzNzE1OCwxNi4yNjM4ODM3IEw2NS4yMjQ3MTU4LDE2LjI2Mzg4MzcgWiBNNjUuMjQ2NzE1OCwxMS43MTE4ODM3IEM2NS40NjY3MTU4LDkuNjAxODgzNzMgNjYuNDUwNzE1OCw3LjY2MTg4MzczIDY5LjUxNjcxNTgsNy42NjE4ODM3MyBDNzIuNjYxNzE1OCw3LjY2MTg4MzczIDczLjg0NDcxNTgsOS4yOTM4ODM3MyA3My44NTA3MTU4LDExLjYyNjg4MzcgQzczLjgwNjcxNTgsMTIuNzMzODgzNyA3My42NDM3MTU4LDEyLjk4Njg4MzcgNzIuOTYzNzE1OCwxMi45ODY4ODM3IEw2NS4xODE3MTU4LDEyLjk4Njg4MzcgQzY1LjE5MDEzMTEsMTIuNTU3NjQ5OSA2NS4yMTE4MDgxLDEyLjEyODc3ODUgNjUuMjQ2NzE1OCwxMS43MDA4ODM3IE0xMjMuNTAwNzE2LDE2LjI2Mzg4MzcgQzEyMy40ODE3MTYsMTYuMDE2ODgzNyAxMjMuNDY3NzE2LDE1Ljg1MDg4MzcgMTIzLjQ1OTcxNiwxNS41NjE4ODM3IEwxMzIuNzg0NzE2LDE1LjU2MTg4MzcgQzEzMy4yODY0NTcsMTUuNTgzNzYzOSAxMzMuNzg5MDU1LDE1LjU0ODE5OTUgMTM0LjI4MjcxNiwxNS40NTU4ODM3IEMxMzUuMjMxNzE2LDE1LjIxMzg4MzcgMTM2LjI1NDcxNiwxNC40NjM4ODM3IDEzNi4yNTY3MTYsMTIuMTQzODgzNyBDMTM2LjI1NjcxNiw5LjMzMTg4MzczIDEzNS4zMDU3MTYsNy42NDM4ODM3MyAxMzMuODA5NzE2LDYuNTc0ODgzNzMgQzEzMC43MzM3MTYsNC4zOTg4ODM3MyAxMjQuMDM2NzE2LDQuMzk4ODgzNzMgMTIxLjI4MTcxNiw3LjI1MTg4MzczIEMxMTguNTI2NzE2LDEwLjEwNDg4MzcgMTE4LjgzMzcxNiwxNi44NzI4ODM3IDEyMC4yOTQ3MTYsMTkuNzgxODgzNyBDMTIwLjg1MzY3OCwyMC44NDkwMDkzIDEyMS43Mjk0ODQsMjEuNzE2NzgwOCAxMjIuODAxNzE2LDIyLjI2NTg4MzcgQzEyMy43MzY3MTYsMjIuNzkwODgzNyAxMjUuMTA0NzE2LDIyLjk5NDg4MzcgMTI2LjQyOTcxNiwyMi45OTQ4ODM3IEwxMzUuNzEwNzE2LDIyLjk5NDg4MzcgTDEzNS43MTA3MTYsMjAuNDI0ODgzNyBMMTI3LjA3MzcxNiwyMC40MjQ4ODM3IEMxMjQuMjgwNzE2LDIwLjQwMjg4MzcgMTIzLjY0NzcxNiwxOC4zMzM4ODM3IDEyMy41MTM3MTYsMTYuMjYzODgzNyBMMTIzLjUwMDcxNiwxNi4yNjM4ODM3IEwxMjMuNTAwNzE2LDE2LjI2Mzg4MzcgWiBNMTIzLjUzMjcxNiwxMS43MTE4ODM3IEMxMjMuNzU1NzE2LDkuNjAxODgzNzMgMTI0Ljc0MDcxNiw3LjY2MTg4MzczIDEyNy44MDU3MTYsNy42NjE4ODM3MyBDMTMwLjk1MTcxNiw3LjY2MTg4MzczIDEzMi4xMzQ3MTYsOS4yOTM4ODM3MyAxMzIuMTM3NzE2LDExLjYyNjg4MzcgQzEzMi4wOTY3MTYsMTIuNzMzODgzNyAxMzEuOTMwNzE2LDEyLjk4Njg4MzcgMTMxLjI1NTcxNiwxMi45ODY4ODM3IEwxMjMuNDU0NzE2LDEyLjk4Njg4MzcgQzEyMy40NzA3MTYsMTIuMjgyODgzNyAxMjMuNTE5NzE2LDExLjcwMDg4MzcgMTIzLjUxOTcxNiwxMS43MDA4ODM3IE00NC4zMTI3MTU4LDcuODY2ODgzNzMgQzQzLjgyMTcxNTgsNi42Njk4ODM3MyA0My42Mzk3MTU4LDYuMTU4ODgzNzMgNDIuOTk5NzE1OCw1LjMwMTg4MzczIEw2Mi4xMzU3MTU4LDUuMzAxODgzNzMgQzYxLjA4OTIwNzgsNS44NzExOTg2OCA2MC4yNjMwODQ3LDYuNzc0MDU1ODggNTkuNzg4NzE1OCw3Ljg2Njg4MzczIEw1NC4zMDY3MTU4LDcuODY2ODgzNzMgTDU0LjMwNjcxNTgsMjIuOTk0ODgzNyBMNTAuMDcyNzE1OCwyMi45OTQ4ODM3IEw1MC4wNzI3MTU4LDcuODY2ODgzNzMgTDQ0LjMxMjcxNTgsNy44NjY4ODM3MyBMNDQuMzEyNzE1OCw3Ljg2Njg4MzczIFoiIGlkPSJTaGFwZSIgZmlsbD0iIzAxNDY5NCI+PC9wYXRoPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+" alt="TenneT">
+  `;
+  frag.appendChild(header);
+
+  const page = document.createElement('div');
+  page.className = 'rpt-page';
+
+  groupOrder.forEach(groupName => {
+    const items = grouped[groupName];
+    if (!items.length) return;
+
+    const lbl = document.createElement('div');
+    lbl.className = 'group-label';
+    lbl.textContent = groupName;
+    page.appendChild(lbl);
+
+    const stats  = items.filter(i => i.kind === 'stat');
+    const tables = items.filter(i => i.kind === 'table');
+
+    if (stats.length) {
+      const grid = document.createElement('div');
+      grid.className = 'stat-grid';
+      stats.forEach(({ queryName, description, value }) => {
+        const card = document.createElement('div');
+        card.className = 'stat-card';
+        card.innerHTML = `
+          <div class="stat-value">${value}</div>
+          <div class="stat-query">${queryName}</div>
+          <div class="stat-label">${description}</div>
+        `;
+        grid.appendChild(card);
+      });
+      page.appendChild(grid);
+    }
+
+    tables.forEach(({ queryName, description, table }) => {
+      const rowCount = table.querySelectorAll('tbody tr').length;
+      const card = document.createElement('div');
+      card.className = 'table-card';
+
+      const cardHeader = document.createElement('div');
+      cardHeader.className = 'table-card-header';
+      cardHeader.innerHTML = `
+        <div class="table-card-qname">${queryName}</div>
+        <div class="table-card-desc">${description}</div>
+      `;
+
+      const wrap = document.createElement('div');
+      wrap.className = 'tbl-wrap';
+      wrap.appendChild(table);
+
+      const rowBadge = document.createElement('div');
+      rowBadge.className = 'tbl-row-count';
+      rowBadge.textContent = `${rowCount} row${rowCount !== 1 ? 's' : ''}`;
+
+      card.appendChild(cardHeader);
+      card.appendChild(wrap);
+      card.appendChild(rowBadge);
+      page.appendChild(card);
+    });
+  });
+
+  frag.appendChild(page);
+
+  if (hashValues.length) {
+    const footer = document.createElement('div');
+    footer.className = 'rpt-footer';
+    footer.innerHTML = `
+      <span class="rpt-footer-label">MD5</span>
+      ${hashValues.map(h => `<span class="rpt-footer-hash">${h}</span>`).join('')}
+    `;
+    frag.appendChild(footer);
+  }
+
+  document.body.innerHTML = '';
+  document.body.appendChild(frag);
+});
+</script>
+</head>
+
+   <body>
+      <div style="padding:10px;border: 1px none black">
+               <H1 style="color:rgb(0,0,0)" class="text-left">Statistics Report for Information Container</H1>
+               <H6 style="color:rgb(0,0,0)" class="text-left">Supplied Information Container: IC_B6.0_ContractExample.zip</H6>
+               <H6 style="color:rgb(0,0,0)" class="text-left">Category: VS2</H6>
+      </div>
+      <div style="padding:10px;border: 1px none black">
+               <H3 style="color:rgb(0,0,0)" class="text-left">05_2_NumberOfVS2RelatedSpecificationsToActivityTypes</H3>
+               <p style="color:rgb(0,0,0)" class="text-left">The amount VS2 requirements related to Activity Types</p>
+         <div style="padding:10px;border: 1px none black" class="Specifications">
+            <pre class="tsv-data">?ReqCountActivityTypes
+         410
+         </pre>
+         </div>
+      </div>
+      <div style="padding:10px;border: 1px none black">
+               <H3 style="color:rgb(0,0,0)" class="text-left">11_Obj_NumberOfAppliedConceptualPhysicalObjects</H3>
+               <p style="color:rgb(0,0,0)" class="text-left">Number of Object Types in this container</p>
+         <div style="padding:10px;border: 1px none black" class="Assets">
+            <pre class="tsv-data">?typeObjectCount
+         14
+         </pre>
+         </div>
+      </div>
+      <div style="padding:10px;border: 1px none black">
+               <H3 style="color:rgb(0,0,0)" class="text-left">12_Obj_NumberOfAppliedIndividualPhysicalObjects</H3>
+               <p style="color:rgb(0,0,0)" class="text-left">Number of Object Instances (Individuals) in this container</p>
+         <div style="padding:10px;border: 1px none black" class="Assets">
+            <pre class="tsv-data">?indivObjCount
+         20
+         </pre>
+         </div>
+      </div>
+      <div style="padding:10px;border: 1px none black">
+               <H3 style="color:rgb(0,0,0)" class="text-left">13_Space_NumberOfAppliedConceptualSpaces</H3>
+               <p style="color:rgb(0,0,0)" class="text-left">Number of Space Types in this container</p>
+         <div style="padding:10px;border: 1px none black" class="Assets">
+            <pre class="tsv-data">?typeSpaceCount
+         24
+         </pre>
+         </div>
+      </div>
+      <div style="padding:10px;border: 1px none black">
+               <H3 style="color:rgb(0,0,0)" class="text-left">14_Space_NumberOfAppliedIndividualSpaces</H3>
+               <p style="color:rgb(0,0,0)" class="text-left">Number of Space Instances (Individuals) in this container</p>
+         <div style="padding:10px;border: 1px none black" class="Assets">
+            <pre class="tsv-data">?indivSpaceCount
+         3
+         </pre>
+         </div>
+      </div>
+      <div style="padding:10px;border: 1px none black">
+               <H3 style="color:rgb(0,0,0)" class="text-left">15_Doc_NumberOfIndividualDocuments</H3>
+               <p style="color:rgb(0,0,0)" class="text-left">Total number of documents that are detected in this container</p>
+         <div style="padding:10px;border: 1px none black" class="Documents & Verification">
+            <pre class="tsv-data">?documentCount
+         68
+         </pre>
+         </div>
+      </div>
+      <div style="padding:10px;border: 1px none black">
+               <H3 style="color:rgb(0,0,0)" class="text-left">16_NumberOVerificationPlans</H3>
+               <p style="color:rgb(0,0,0)" class="text-left">Raw number of verification plans</p>
+         <div style="padding:10px;border: 1px none black" class="Documents & Verification">
+            <pre class="tsv-data">?verificationPlanUriCount
+         453
+         </pre>
+         </div>
+      </div>
+      <div style="padding:10px;border: 1px none black">
+               <H3 style="color:rgb(0,0,0)" class="text-left">17_NumberOfVerifications</H3>
+               <p style="color:rgb(0,0,0)" class="text-left">Raw number of verification results</p>
+         <div style="padding:10px;border: 1px none black" class="Documents & Verification">
+            <pre class="tsv-data">?verificationResultUriCount
+         6
+         </pre>
+         </div>
+      </div>
+      <div style="padding:10px;border: 1px none black">
+               <p style="color:rgb(0,0,0)" class="text-left">84B4E2187AC1D37920F2EB78A4AB5039</p>
+               <p style="color:rgb(0,0,0)" class="text-left">94065140B28D6922E4E3C81A93843E18</p>
+      </div>
+   </body>
+</html>

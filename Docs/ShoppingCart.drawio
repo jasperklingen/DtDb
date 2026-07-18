@@ -1,0 +1,402 @@
+<mxfile host="app.diagrams.net" version="21.7.5">
+
+  <!-- ═══════════════════════════════════════════════════════
+       PAGE 1 — System Overview
+       ═══════════════════════════════════════════════════════ -->
+  <diagram id="d1" name="System Overview">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1"
+                  connect="1" arrows="1" fold="1" page="1" pageScale="1"
+                  pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ── User Browser ── -->
+        <mxCell id="p1n1"
+          value="User Browser"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=13;"
+          vertex="1" parent="1">
+          <mxGeometry x="490" y="40" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ── ShoppingCart.fmw ── -->
+        <mxCell id="p1n2"
+          value="&lt;b&gt;ShoppingCart.fmw&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px;&quot;&gt;FME Data Streaming Workspace&lt;br&gt;SPARQL → triplestore → CSV · @Value(csv) injected into HTML&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;"
+          vertex="1" parent="1">
+          <mxGeometry x="280" y="190" width="610" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ── SOV.xlsx (config, referenced by ShoppingCart.fmw) ── -->
+        <mxCell id="p1n3"
+          value="SOV.xlsx&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Config file&lt;br&gt;(FME Shared Resources)&lt;/font&gt;"
+          style="shape=mxgraph.flowchart.document;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;"
+          vertex="1" parent="1">
+          <mxGeometry x="980" y="190" width="140" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ── ShoppingCart.html (browser) ── -->
+        <mxCell id="p1n4"
+          value="&lt;b&gt;ShoppingCart.html&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Tree view · quantity inputs (0–20) · Run button&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;"
+          vertex="1" parent="1">
+          <mxGeometry x="345" y="390" width="480" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ── SOV.fmw job 1 ── -->
+        <mxCell id="p1n5"
+          value="SOV.fmw&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;job 1&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;"
+          vertex="1" parent="1">
+          <mxGeometry x="200" y="580" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ── SOV.fmw job 2 ── -->
+        <mxCell id="p1n6"
+          value="SOV.fmw&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;job 2&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;"
+          vertex="1" parent="1">
+          <mxGeometry x="510" y="580" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ── SOV.fmw job n ── -->
+        <mxCell id="p1n7"
+          value="SOV.fmw&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;job n&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;"
+          vertex="1" parent="1">
+          <mxGeometry x="820" y="580" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ── Ellipsis between jobs ── -->
+        <mxCell id="p1n8"
+          value="…"
+          style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=20;"
+          vertex="1" parent="1">
+          <mxGeometry x="690" y="595" width="90" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ── Edge: User → ShoppingCart.fmw ── -->
+        <mxCell id="p1e1"
+          value="HTTP GET ShoppingCart.fmw?CONFIG=…&amp;RelaticsWorkspace=…"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;fontStyle=2;
+                 exitX=0.5;exitY=1;exitDx=0;exitDy=0;
+                 entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+          edge="1" source="p1n1" target="p1n2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ── Edge: Config → ShoppingCart.fmw (dashed, reads config) ── -->
+        <mxCell id="p1e2"
+          value="reads config (FeatureReader)"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;fontSize=10;fontStyle=2;
+                 exitX=0;exitY=0.5;exitDx=0;exitDy=0;
+                 entryX=1;entryY=0.5;entryDx=0;entryDy=0;"
+          edge="1" source="p1n3" target="p1n2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ── Edge: ShoppingCart.fmw → HTML ── -->
+        <mxCell id="p1e3"
+          value="HTML streamed as response (CSV injected via @Value)"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;fontStyle=2;
+                 exitX=0.5;exitY=1;exitDx=0;exitDy=0;
+                 entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+          edge="1" source="p1n2" target="p1n4" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ── Edge: HTML → SOV job 1 ── -->
+        <mxCell id="p1e4"
+          value="GET /SOV.fmw (fire-and-forget)"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;fontStyle=2;
+                 exitX=0.5;exitY=1;exitDx=0;exitDy=0;
+                 entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+          edge="1" source="p1n4" target="p1n5" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ── Edge: HTML → SOV job 2 ── -->
+        <mxCell id="p1e5"
+          value="GET /SOV.fmw (fire-and-forget)"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;fontStyle=2;
+                 exitX=0.5;exitY=1;exitDx=0;exitDy=0;
+                 entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+          edge="1" source="p1n4" target="p1n6" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ── Edge: HTML → SOV job n ── -->
+        <mxCell id="p1e6"
+          value="GET /SOV.fmw (fire-and-forget)"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;fontStyle=2;
+                 exitX=0.5;exitY=1;exitDx=0;exitDy=0;
+                 entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+          edge="1" source="p1n4" target="p1n7" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- ═══════════════════════════════════════════════════════
+       PAGE 2 — ShoppingCart.fmw Transformer Pipeline
+       ═══════════════════════════════════════════════════════ -->
+  <diagram id="d2" name="Transformer Pipeline">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1"
+                  connect="1" arrows="1" fold="1" page="1" pageScale="1"
+                  pageWidth="1200" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ══════════════════════════════════
+             STAGE 1 — Config Loading
+             ══════════════════════════════════ -->
+        <mxCell id="s1"
+          value="1 · Config Loading"
+          style="swimlane;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="1100" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s1t1"
+          value="Creator_2"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="s1">
+          <mxGeometry x="20" y="55" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s1t2"
+          value="FeatureReader&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;SOV.xlsx / SOVQuerys&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="s1">
+          <mxGeometry x="210" y="55" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s1t3"
+          value="Tester + Sampler&lt;br&gt;+ AttributeKeeper&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;filter QueryName=&quot;Tree&quot;&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="s1">
+          <mxGeometry x="440" y="45" width="190" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s1out"
+          value="→ &lt;b&gt;Query&lt;/b&gt;, &lt;b&gt;QueryEndpoint&lt;/b&gt;"
+          style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=2;"
+          vertex="1" parent="s1">
+          <mxGeometry x="700" y="60" width="220" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s1e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s1t1" target="s1t2" parent="s1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s1e2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s1t2" target="s1t3" parent="s1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════
+             STAGE 2 — SPARQL Execution
+             ══════════════════════════════════ -->
+        <mxCell id="s2"
+          value="2 · SPARQL Execution"
+          style="swimlane;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="230" width="1100" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s2t1"
+          value="AC_Query&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;writes SPARQL query&lt;br&gt;to &quot;query&quot; attribute&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="s2">
+          <mxGeometry x="20" y="45" width="170" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s2t2"
+          value="HTTPCaller&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;POST to QueryEndpoint&lt;br&gt;(TenneT Laces web connection)&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="s2">
+          <mxGeometry x="270" y="45" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s2out"
+          value="→ &lt;b&gt;_response_body&lt;/b&gt; (JSON)&lt;br&gt;→ _http_status_code"
+          style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=2;"
+          vertex="1" parent="s2">
+          <mxGeometry x="540" y="55" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s2e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s2t1" target="s2t2" parent="s2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════
+             STAGE 3 — Response Parsing
+             ══════════════════════════════════ -->
+        <mxCell id="s3"
+          value="3 · Response Parsing"
+          style="swimlane;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="420" width="1100" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3t1"
+          value="JSONFragmenter&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;flattens bindings[*]&lt;br&gt;→ one feature per row&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="s3">
+          <mxGeometry x="20" y="45" width="180" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3t2"
+          value="AttributeExposer&lt;br&gt;+ BulkAttributeRenamer&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;normalise attribute names&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="s3">
+          <mxGeometry x="280" y="45" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3out"
+          value="→ features with &lt;b&gt;child&lt;/b&gt;, &lt;b&gt;parent&lt;/b&gt;,&lt;br&gt;name, type attributes"
+          style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=2;"
+          vertex="1" parent="s3">
+          <mxGeometry x="550" y="55" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s3t1" target="s3t2" parent="s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════
+             STAGE 4 — Tree Construction
+             ══════════════════════════════════ -->
+        <mxCell id="s4"
+          value="4 · Tree Construction"
+          style="swimlane;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="610" width="1100" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s4t1"
+          value="InlineQuerier&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;recursive SQL (WITH RECURSIVE)&lt;br&gt;→ depth + path per node&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="s4">
+          <mxGeometry x="20" y="45" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s4t2"
+          value="StringConcatenator&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;formats each node as CSV line&lt;br&gt;(uuid, path)&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="s4">
+          <mxGeometry x="300" y="45" width="190" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s4t3"
+          value="Sorter + Aggregator&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;concatenates all lines&lt;br&gt;→ &lt;b&gt;_result&lt;/b&gt; (full CSV string)&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="s4">
+          <mxGeometry x="570" y="45" width="190" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s4e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s4t1" target="s4t2" parent="s4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s4e2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s4t2" target="s4t3" parent="s4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════
+             STAGE 5 — HTML Assembly
+             ══════════════════════════════════ -->
+        <mxCell id="s5"
+          value="5 · HTML Assembly"
+          style="swimlane;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="800" width="1100" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s5t1"
+          value="AC_header_CSV&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;prepends &quot;child,path&quot;&lt;br&gt;header row&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="s5">
+          <mxGeometry x="20" y="45" width="180" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s5t2"
+          value="AC_HTML_JSPagina&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;injects CSV via @Value(csv)&lt;br&gt;into HTML template&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;"
+          vertex="1" parent="s5">
+          <mxGeometry x="280" y="45" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s5out"
+          value="→ complete HTML+JS page&lt;br&gt;with &lt;b&gt;CSV embedded&lt;/b&gt; in &lt;code&gt;csvData&lt;/code&gt;"
+          style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=2;"
+          vertex="1" parent="s5">
+          <mxGeometry x="550" y="55" width="300" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s5e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s5t1" target="s5t2" parent="s5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════
+             STAGE 6 — HTTP Response
+             ══════════════════════════════════ -->
+        <mxCell id="s6"
+          value="6 · HTTP Response"
+          style="swimlane;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="990" width="1100" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s6t1"
+          value="HTML Writer&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;format: HTML&lt;br&gt;dataset: Tree.html&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;"
+          vertex="1" parent="s6">
+          <mxGeometry x="20" y="45" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s6t2"
+          value="fmedatastreaming service&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;registered endpoint&lt;br&gt;(no disk write)&lt;/font&gt;"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;"
+          vertex="1" parent="s6">
+          <mxGeometry x="260" y="45" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s6t3"
+          value="Browser receives HTML"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;"
+          vertex="1" parent="s6">
+          <mxGeometry x="540" y="55" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s6e1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s6t1" target="s6t2" parent="s6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s6e2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="s6t2" target="s6t3" parent="s6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════
+             Inter-stage arrows
+             ══════════════════════════════════ -->
+        <mxCell id="ie1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s1" target="s2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ie2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s2" target="s3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ie3" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s3" target="s4" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ie4" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s4" target="s5" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ie5" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s5" target="s6" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+</mxfile>

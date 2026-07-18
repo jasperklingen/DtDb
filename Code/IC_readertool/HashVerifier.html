@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>IC Hash Verifier</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-ui:   'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+
+      --page:   #edf1f7;
+      --card:   #ffffff;
+      --border: #b8c4d4;
+
+      --text-primary: #080e18;
+      --text-muted:   #5a6878;
+
+      --accent-blue: #1848a0;
+      --accent-cyan: #0a7a8e;
+
+      --note-bg:     #e8eef8;
+      --neutral-bg:  #dde4ee;
+      --neutral-text:#445060;
+
+      --success-bg:   #cceede;
+      --success-text: #064830;
+      --error-bg:     #fde8e8;
+      --error-text:   #7a1414;
+
+      --stripe: #f4f7fc;
+      --radius: 8px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page:   #080c14;
+        --card:   #101624;
+        --border: #1e2d45;
+
+        --text-primary: #dce8f8;
+        --text-muted:   #4a5e78;
+
+        --accent-blue: #3a78e8;
+        --accent-cyan: #20d8a0;
+
+        --note-bg:     #0c1420;
+        --neutral-bg:  #101e30;
+        --neutral-text:#5a7090;
+
+        --success-bg:   #082818;
+        --success-text: #20d8a0;
+        --error-bg:     #280808;
+        --error-text:   #f07070;
+
+        --stripe: #0c1220;
+      }
+    }
+
+    :root[data-theme="light"] {
+      --page: #edf1f7; --card: #ffffff; --border: #b8c4d4;
+      --text-primary: #080e18; --text-muted: #5a6878;
+      --accent-blue: #1848a0; --accent-cyan: #0a7a8e;
+      --note-bg: #e8eef8; --neutral-bg: #dde4ee; --neutral-text: #445060;
+      --success-bg: #cceede; --success-text: #064830;
+      --error-bg: #fde8e8; --error-text: #7a1414;
+      --stripe: #f4f7fc;
+    }
+
+    :root[data-theme="dark"] {
+      --page: #080c14; --card: #101624; --border: #1e2d45;
+      --text-primary: #dce8f8; --text-muted: #4a5e78;
+      --accent-blue: #3a78e8; --accent-cyan: #20d8a0;
+      --note-bg: #0c1420; --neutral-bg: #101e30; --neutral-text: #5a7090;
+      --success-bg: #082818; --success-text: #20d8a0;
+      --error-bg: #280808; --error-text: #f07070;
+      --stripe: #0c1220;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--page);
+      color: var(--text-primary);
+      font-family: var(--font-ui);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      background: var(--card);
+      padding: 22px 40px 18px;
+      border-top: 3px solid var(--accent-blue);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .page-header-title {
+      color: var(--text-primary);
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .page-header-sub {
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      margin-top: 3px;
+    }
+    .theme-btn {
+      background: var(--neutral-bg);
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-family: var(--font-ui);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--neutral-text);
+      cursor: pointer;
+      letter-spacing: 0.3px;
+    }
+    .theme-btn:hover { filter: brightness(0.95); }
+
+    /* ── Layout ── */
+    .content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 56px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 820px) {
+      .content { grid-template-columns: 1fr; }
+      .page-header { padding: 18px 20px 14px; }
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 3px;
+      background: var(--note-bg);
+      color: var(--accent-blue);
+      border: 0.5px solid var(--border);
+      flex-shrink: 0;
+    }
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .card-body { padding: 18px; }
+
+    /* ── Form fields ── */
+    .field { margin-bottom: 14px; }
+    .field:last-of-type { margin-bottom: 0; }
+    .field-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    .field-input {
+      width: 100%;
+      background: var(--page);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 7px 10px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .field-input:focus { border-color: var(--accent-blue); }
+    .field-input::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 16px 0;
+    }
+
+    /* ── String preview ── */
+    .preview-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    .preview-box {
+      background: var(--stripe);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 8px 10px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      word-break: break-all;
+      min-height: 34px;
+      line-height: 1.5;
+    }
+
+    /* ── Hash output ── */
+    .hash-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .hash-output {
+      flex: 1;
+      background: var(--note-bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 9px 12px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--accent-blue);
+      letter-spacing: 0.05em;
+      word-break: break-all;
+    }
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 7px 10px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 13px;
+      flex-shrink: 0;
+      transition: background 0.12s, color 0.12s;
+    }
+    .copy-btn:hover { background: var(--neutral-bg); color: var(--text-primary); }
+    .copy-btn.copied { background: var(--success-bg); color: var(--success-text); border-color: transparent; }
+
+    /* ── Compare ── */
+    .compare-section { margin-top: 14px; }
+    .compare-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .compare-input {
+      flex: 1;
+      background: var(--page);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 7px 10px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .compare-input:focus { border-color: var(--accent-blue); }
+    .compare-input::placeholder { color: var(--text-muted); opacity: 0.5; }
+    .match-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      min-width: 64px;
+      text-align: center;
+      letter-spacing: 0.2px;
+    }
+    .match-badge.match   { background: var(--success-bg); color: var(--success-text); }
+    .match-badge.no-match{ background: var(--error-bg);   color: var(--error-text); }
+    .match-badge.empty   { background: var(--neutral-bg); color: var(--neutral-text); }
+
+    /* ── Numbers list (Hash 2) ── */
+    .numbers-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .add-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 4px 10px;
+      font-family: var(--font-ui);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent-blue);
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .add-btn:hover { background: var(--note-bg); }
+
+    .num-list { display: flex; flex-direction: column; gap: 4px; }
+    .num-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .num-label-input {
+      flex: 1;
+      background: var(--page);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 5px 8px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      outline: none;
+    }
+    .num-label-input:focus { border-color: var(--border); }
+    .num-value-input {
+      width: 72px;
+      background: var(--page);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 5px 8px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      outline: none;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .num-value-input:focus { border-color: var(--accent-blue); }
+    .remove-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 15px;
+      padding: 2px 4px;
+      border-radius: 3px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .remove-btn:hover { color: var(--error-text); background: var(--error-bg); }
+
+    .drag-handle {
+      cursor: grab;
+      color: var(--text-muted);
+      font-size: 14px;
+      padding: 2px 4px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      line-height: 1;
+      user-select: none;
+    }
+    .drag-handle:hover { color: var(--text-primary); }
+    .drag-handle:active { cursor: grabbing; }
+    .num-row.dragging { opacity: 0.35; }
+    .num-row.drag-over { outline: 2px solid var(--accent-blue); border-radius: 4px; background: var(--note-bg); }
+  </style>
+</head>
+<body>
+
+<header class="page-header">
+  <div>
+    <div class="page-header-title">IC Hash Verifier</div>
+    <div class="page-header-sub">Compute &amp; compare MD5 checksums for Information Container reports</div>
+  </div>
+  <button class="theme-btn" onclick="toggleTheme()">Toggle theme</button>
+</header>
+
+<div class="content">
+
+  <!-- ── Hash 1 ── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-num">HASH 1</span>
+      <span class="card-title">Metadata — date &amp; filename</span>
+    </div>
+    <div class="card-body">
+
+      <div class="field">
+        <label class="field-label" for="h1-date">Date</label>
+        <input class="field-input" id="h1-date" type="text" placeholder="e.g. 20251127" oninput="computeHash1(); computeHash2(); updateMeta()">
+      </div>
+      <div class="field">
+        <label class="field-label" for="h1-file">Filename</label>
+        <input class="field-input" id="h1-file" type="text" placeholder="e.g. IC_B6.0_ContractExample_Report.html" oninput="computeHash1(); computeHash2(); updateMeta()">
+      </div>
+
+      <hr class="divider">
+
+      <div class="preview-label">Input string</div>
+      <div class="preview-box" id="h1-preview">—</div>
+
+      <div class="hash-row">
+        <div class="hash-output" id="h1-hash">—</div>
+        <button class="copy-btn" id="h1-copy" onclick="copyHash('h1-hash','h1-copy')" title="Copy hash">⎘</button>
+      </div>
+
+      <div class="compare-section">
+        <label class="field-label" for="h1-compare">Compare against</label>
+        <div class="compare-row">
+          <input class="compare-input" id="h1-compare" type="text"
+                 placeholder="Paste expected hash…"
+                 oninput="checkMatch('h1-hash','h1-compare','h1-badge')">
+          <span class="match-badge empty" id="h1-badge">—</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Hash 2 ── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-num">HASH 2</span>
+      <span class="card-title">Metadata + statistics</span>
+    </div>
+    <div class="card-body">
+
+      <div class="field">
+        <label class="field-label" for="h2-date">Date</label>
+        <input class="field-input" id="h2-date" type="text" placeholder="e.g. 20251127" oninput="computeHash2()">
+      </div>
+      <div class="field">
+        <label class="field-label" for="h2-file">Filename</label>
+        <input class="field-input" id="h2-file" type="text" placeholder="e.g. IC_B6.0_ContractExample_Report.html" oninput="computeHash2()">
+      </div>
+
+      <hr class="divider">
+
+      <div class="numbers-header">
+        <span class="field-label" style="margin:0">Query values</span>
+        <button class="add-btn" onclick="addNumRow()">+ Add row</button>
+      </div>
+
+      <div class="num-list" id="num-list"></div>
+
+      <hr class="divider">
+
+      <div class="preview-label">Input string</div>
+      <div class="preview-box" id="h2-preview">—</div>
+
+      <div class="hash-row">
+        <div class="hash-output" id="h2-hash">—</div>
+        <button class="copy-btn" id="h2-copy" onclick="copyHash('h2-hash','h2-copy')" title="Copy hash">⎘</button>
+      </div>
+
+      <div class="compare-section">
+        <label class="field-label" for="h2-compare">Compare against</label>
+        <div class="compare-row">
+          <input class="compare-input" id="h2-compare" type="text"
+                 placeholder="Paste expected hash…"
+                 oninput="checkMatch('h2-hash','h2-compare','h2-badge')">
+          <span class="match-badge empty" id="h2-badge">—</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ── Pure JS MD5 (Paul Johnston / Joseph Myers) ── */
+function md5(str) {
+  function safeAdd(x, y) { var l = (x & 0xFFFF) + (y & 0xFFFF); return ((x >> 16) + (y >> 16) + (l >> 16)) << 16 | l & 0xFFFF; }
+  function rol(n, c)      { return n << c | n >>> (32 - c); }
+  function cmn(q, a, b, x, s, t) { return safeAdd(rol(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b); }
+  function ff(a,b,c,d,x,s,t) { return cmn(b & c | ~b & d, a,b,x,s,t); }
+  function gg(a,b,c,d,x,s,t) { return cmn(b & d | c & ~d, a,b,x,s,t); }
+  function hh(a,b,c,d,x,s,t) { return cmn(b ^ c ^ d,      a,b,x,s,t); }
+  function ii(a,b,c,d,x,s,t) { return cmn(c ^ (b | ~d),   a,b,x,s,t); }
+
+  /* UTF-8 encode */
+  var utf8 = '';
+  for (var i = 0; i < str.length; i++) {
+    var c = str.charCodeAt(i);
+    if (c < 128) { utf8 += String.fromCharCode(c); }
+    else if (c < 2048) { utf8 += String.fromCharCode(c >> 6 | 192, c & 63 | 128); }
+    else { utf8 += String.fromCharCode(c >> 12 | 224, c >> 6 & 63 | 128, c & 63 | 128); }
+  }
+  str = utf8;
+
+  var x = [], len = str.length * 8;
+  for (var i = 0; i < str.length * 8; i += 8) x[i >> 5] |= (str.charCodeAt(i / 8) & 0xFF) << i % 32;
+  x[len >> 5] |= 0x80 << len % 32;
+  x[(len + 64 >>> 9 << 4) + 14] = len;
+
+  var a = 1732584193, b = -271733879, c = -1732584194, d = 271733878;
+  for (var i = 0; i < x.length; i += 16) {
+    var oa = a, ob = b, oc = c, od = d;
+    a=ff(a,b,c,d,x[i+0],7,-680876936);   d=ff(d,a,b,c,x[i+1],12,-389564586);
+    c=ff(c,d,a,b,x[i+2],17,606105819);   b=ff(b,c,d,a,x[i+3],22,-1044525330);
+    a=ff(a,b,c,d,x[i+4],7,-176418897);   d=ff(d,a,b,c,x[i+5],12,1200080426);
+    c=ff(c,d,a,b,x[i+6],17,-1473231341); b=ff(b,c,d,a,x[i+7],22,-45705983);
+    a=ff(a,b,c,d,x[i+8],7,1770035416);   d=ff(d,a,b,c,x[i+9],12,-1958414417);
+    c=ff(c,d,a,b,x[i+10],17,-42063);     b=ff(b,c,d,a,x[i+11],22,-1990404162);
+    a=ff(a,b,c,d,x[i+12],7,1804603682);  d=ff(d,a,b,c,x[i+13],12,-40341101);
+    c=ff(c,d,a,b,x[i+14],17,-1502002290);b=ff(b,c,d,a,x[i+15],22,1236535329);
+    a=gg(a,b,c,d,x[i+1],5,-165796510);   d=gg(d,a,b,c,x[i+6],9,-1069501632);
+    c=gg(c,d,a,b,x[i+11],14,643717713);  b=gg(b,c,d,a,x[i+0],20,-373897302);
+    a=gg(a,b,c,d,x[i+5],5,-701558691);   d=gg(d,a,b,c,x[i+10],9,38016083);
+    c=gg(c,d,a,b,x[i+15],14,-660478335); b=gg(b,c,d,a,x[i+4],20,-405537848);
+    a=gg(a,b,c,d,x[i+9],5,568446438);    d=gg(d,a,b,c,x[i+14],9,-1019803690);
+    c=gg(c,d,a,b,x[i+3],14,-187363961);  b=gg(b,c,d,a,x[i+8],20,1163531501);
+    a=gg(a,b,c,d,x[i+13],5,-1444681467); d=gg(d,a,b,c,x[i+2],9,-51403784);
+    c=gg(c,d,a,b,x[i+7],14,1735328473);  b=gg(b,c,d,a,x[i+12],20,-1926607734);
+    a=hh(a,b,c,d,x[i+5],4,-378558);      d=hh(d,a,b,c,x[i+8],11,-2022574463);
+    c=hh(c,d,a,b,x[i+11],16,1839030562); b=hh(b,c,d,a,x[i+14],23,-35309556);
+    a=hh(a,b,c,d,x[i+1],4,-1530992060);  d=hh(d,a,b,c,x[i+4],11,1272893353);
+    c=hh(c,d,a,b,x[i+7],16,-155497632);  b=hh(b,c,d,a,x[i+10],23,-1094730640);
+    a=hh(a,b,c,d,x[i+13],4,681279174);   d=hh(d,a,b,c,x[i+0],11,-358537222);
+    c=hh(c,d,a,b,x[i+3],16,-722521979);  b=hh(b,c,d,a,x[i+6],23,76029189);
+    a=hh(a,b,c,d,x[i+9],4,-640364487);   d=hh(d,a,b,c,x[i+12],11,-421815835);
+    c=hh(c,d,a,b,x[i+15],16,530742520);  b=hh(b,c,d,a,x[i+2],23,-995338651);
+    a=ii(a,b,c,d,x[i+0],6,-198630844);   d=ii(d,a,b,c,x[i+7],10,1126891415);
+    c=ii(c,d,a,b,x[i+14],15,-1416354905);b=ii(b,c,d,a,x[i+5],21,-57434055);
+    a=ii(a,b,c,d,x[i+12],6,1700485571);  d=ii(d,a,b,c,x[i+3],10,-1894986606);
+    c=ii(c,d,a,b,x[i+10],15,-1051523);   b=ii(b,c,d,a,x[i+1],21,-2054922799);
+    a=ii(a,b,c,d,x[i+8],6,1873313359);   d=ii(d,a,b,c,x[i+15],10,-30611744);
+    c=ii(c,d,a,b,x[i+6],15,-1560198380); b=ii(b,c,d,a,x[i+13],21,1309151649);
+    a=ii(a,b,c,d,x[i+4],6,-145523070);   d=ii(d,a,b,c,x[i+11],10,-1120210379);
+    c=ii(c,d,a,b,x[i+2],15,718787259);   b=ii(b,c,d,a,x[i+9],21,-343485551);
+    a=safeAdd(a,oa); b=safeAdd(b,ob); c=safeAdd(c,oc); d=safeAdd(d,od);
+  }
+  var hex = '';
+  for (var i = 0; i < 16; i++) {
+    var v = [a,b,c,d][i >> 2];
+    hex += ('0' + ((v >>> (i % 4 * 8)) & 0xFF).toString(16)).slice(-2);
+  }
+  return hex.toUpperCase();
+}
+
+
+/* ── Hash 1 ── */
+function computeHash1() {
+  var date = document.getElementById('h1-date').value.trim();
+  var file = document.getElementById('h1-file').value.trim();
+  var inputStr = date + file;
+  document.getElementById('h1-preview').textContent = inputStr || '—';
+  document.getElementById('h1-hash').textContent = inputStr ? md5(inputStr) : '—';
+  checkMatch('h1-hash', 'h1-compare', 'h1-badge');
+}
+
+/* ── Hash 2 ── */
+function computeHash2() {
+  var date     = document.getElementById('h2-date').value.trim();
+  var file     = document.getElementById('h2-file').value.trim();
+  var inputStr = '';
+
+  document.querySelectorAll('#num-list .num-row').forEach(function(row) {
+    var label = row.querySelector('.num-label-input').value;
+    var value = row.querySelector('.num-value-input').value.trim();
+    inputStr += label + value;
+  });
+
+  inputStr += date + file;
+
+  document.getElementById('h2-preview').textContent = inputStr || '—';
+  document.getElementById('h2-hash').textContent = inputStr ? md5(inputStr) : '—';
+  checkMatch('h2-hash', 'h2-compare', 'h2-badge');
+}
+
+/* ── Match check ── */
+function checkMatch(hashId, compareId, badgeId) {
+  var computed = document.getElementById(hashId).textContent.trim();
+  var expected = document.getElementById(compareId).value.trim().toUpperCase();
+  var badge    = document.getElementById(badgeId);
+  if (!expected) {
+    badge.textContent = '—'; badge.className = 'match-badge empty'; return;
+  }
+  if (computed === expected) {
+    badge.textContent = '✓ Match'; badge.className = 'match-badge match';
+  } else {
+    badge.textContent = '✗ No match'; badge.className = 'match-badge no-match';
+  }
+}
+
+/* ── Copy ── */
+function copyHash(hashId, btnId) {
+  var text = document.getElementById(hashId).textContent.trim();
+  if (!text || text === '—') return;
+  navigator.clipboard.writeText(text).then(function() {
+    var btn = document.getElementById(btnId);
+    btn.textContent = '✓'; btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = '⎘'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+/* ── Number rows ── */
+var defaultRows = [
+  ['?ReqCountObjectTypes',           '6'],
+  ['?ReqCountIndividualObjects',     '2'],
+  ['?ReqCountSpaceTypes',            '4'],
+  ['?ReqCountIndividualSpaces',      '1'],
+  ['?ReqCountActivityTypes',         '410'],
+  ['?reqDerivedFromLibraryCount',    '422'],
+  ['?projReqCount',                  '4'],
+  ['?typeObjectCount',               '14'],
+  ['?indivObjCount',                 '20'],
+  ['?typeSpaceCount',                '24'],
+  ['?indivSpaceCount',               '3'],
+  ['?documentCount',                 '68'],
+  ['?verificationPlanUriCount',      '453'],
+  ['?verificationResultUriCount',    '6'],
+];
+
+function addNumRow(label, value) {
+  var list = document.getElementById('num-list');
+  var row  = document.createElement('div');
+  row.className = 'num-row';
+  row.innerHTML =
+    '<input class="num-label-input" type="text" placeholder="?QueryName" value="' + (label || '') + '" draggable="false" oninput="computeHash2()">' +
+    '<input class="num-value-input" type="text" placeholder="0" value="' + (value || '') + '" draggable="false" oninput="computeHash2()">' +
+    '<button class="remove-btn" onclick="removeRow(this)" title="Remove">×</button>' +
+    '<span class="drag-handle" title="Drag to reorder">⠿</span>';
+  list.appendChild(row);
+}
+
+function removeRow(btn) {
+  btn.closest('.num-row').remove();
+  computeHash2();
+}
+
+/* ── Theme toggle ── */
+function toggleTheme() {
+  var root    = document.documentElement;
+  var current = root.getAttribute('data-theme');
+  var isDark  = current === 'dark' || (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  root.setAttribute('data-theme', isDark ? 'light' : 'dark');
+}
+
+/* ── Drag-to-reorder ── */
+var dragSrc = null;
+
+document.getElementById('num-list').addEventListener('mousedown', function(e) {
+  if (e.target.closest('.drag-handle')) {
+    e.target.closest('.num-row').setAttribute('draggable', 'true');
+  }
+});
+
+document.getElementById('num-list').addEventListener('dragstart', function(e) {
+  var row = e.target.closest('.num-row[draggable="true"]');
+  if (!row) { e.preventDefault(); return; }
+  dragSrc = row;
+  row.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', '');
+});
+
+document.getElementById('num-list').addEventListener('dragover', function(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  var row = e.target.closest('.num-row');
+  if (!row || row === dragSrc) return;
+  document.querySelectorAll('#num-list .num-row').forEach(function(r) { r.classList.remove('drag-over'); });
+  row.classList.add('drag-over');
+});
+
+document.getElementById('num-list').addEventListener('dragleave', function(e) {
+  if (!e.relatedTarget || !e.relatedTarget.closest('.num-row')) {
+    document.querySelectorAll('#num-list .num-row').forEach(function(r) { r.classList.remove('drag-over'); });
+  }
+});
+
+document.getElementById('num-list').addEventListener('drop', function(e) {
+  e.preventDefault();
+  var row = e.target.closest('.num-row');
+  if (!row || row === dragSrc) return;
+  var list = document.getElementById('num-list');
+  var rows = Array.from(list.querySelectorAll('.num-row'));
+  var srcIdx = rows.indexOf(dragSrc);
+  var tgtIdx = rows.indexOf(row);
+  list.insertBefore(dragSrc, srcIdx < tgtIdx ? row.nextSibling : row);
+  computeHash2();
+});
+
+document.getElementById('num-list').addEventListener('dragend', function() {
+  document.querySelectorAll('#num-list .num-row').forEach(function(r) {
+    r.classList.remove('dragging', 'drag-over');
+    r.removeAttribute('draggable');
+  });
+  dragSrc = null;
+});
+
+/* ── Init ── */
+defaultRows.forEach(function(r) { addNumRow(r[0], r[1]); });
+computeHash1();
+computeHash2();
+</script>
+
+</body>
+</html>
