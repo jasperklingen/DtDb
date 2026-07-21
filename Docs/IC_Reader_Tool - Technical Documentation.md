@@ -1,8 +1,6 @@
-# IC Reader Tool — Technical Documentation
-
 ## Overview
 
-The IC Reader Tool validates an **Information Container (IC)** file — either a raw `.ttl` or a `.zip` of Turtle files — against a configurable set of SPARQL queries, and produces a single, self-contained HTML validation report.
+The IC Reader Tool validates an **Information Container (IC)** file, against a configurable set of SPARQL queries, and produces a single, self-contained HTML validation report. Import can be  either a raw `.ttl` or a `.zip` of Turtle files.
 
 At a high level it:
 
@@ -15,57 +13,29 @@ At a high level it:
 7. **Deletes** the temporary Laces publication.
 
 A standalone companion page, `HashVerifier.html`, lets a reviewer independently recompute those two hashes from a report and confirm they match — without needing FME.
-
-```
-Excel config (.xlsx)
-        │
-        ▼
- VS selection ──────► filter queries by Category
-        │
-        ▼
-InformationContainer (.ttl / .zip)
-        │
-        ▼
- PythonCaller ──► combined RDF graph ──► HTTPCaller_5 (POST)
-        │                                       │
-        │                                       ▼
-        │                          Laces: new publication (id, uri)
-        │                                       │
-        └───────────────► FeatureMerger ◄───────┘
-                                │
-                                ▼
-                  HTTPCaller_6  POST <uri>/sparql   (per query, TSV)
-                                │
-                                ▼
-                     HTML report assembly + MD5 hash footer
-                                │
-                    ┌───────────┴───────────┐
-                    ▼                       ▼
-            HTML Writer (report.html)   HTTPCaller_2 DELETE
-                                         (removes temp publication)
-```
+![[IC_Reader_Tool-System Overview.drawio.png]]
 
 ---
 
 ## Workspace
 
-**Location:** `Workspaces/IC_Reader_Tool/IC_Reader_Tool_JasperV2.fmw`
+**Location:** `Workspaces/IC_Reader_Tool/IC_Reader_Tool.fmw`
 **Config workbook (default):** `IC_Reader_Tool_Config_v5.xlsx`
 
 ### Published Parameters
 
-| Parameter | Description |
-|---|---|
-| `Category` | Which query set to run — `vs1`, `vs2`, or `All` (`0`). `0`/blank means "run everything applicable." |
-| `InformationContainer` | Path/URL to the IC file to validate — a `.ttl` file or a `.zip` archive of `.ttl` files. |
-| `AUTH_USERNAME` / `AUTH_PASSWORD` | HTTP Basic Auth credentials used for all Laces calls (upload, SPARQL, delete). |
-| `LACES_REPO` | Target Laces repository name the temporary publication is created in. |
-| `LACES_BASE_URL` | Base URL of the Laces instance, e.g. `https://<host>`. |
-| `OUT_HTML` | Destination path for the generated HTML report. |
+| Parameter                         | Description                                                                                       |
+| --------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `Category`                        | Which query set to run `vs1`, `vs2`, or `All` (`0`). `0`/blank means "run everything applicable." |
+| `InformationContainer`            | Path/URL to the IC file to validate, a `.ttl` file or a `.zip` archive of `.ttl` files.           |
+| `AUTH_USERNAME` / `AUTH_PASSWORD` | HTTP Basic Auth credentials used for all Laces calls (upload, SPARQL, delete).                    |
+| `LACES_REPO`                      | Target Laces repository name the temporary publication is created in.                             |
+| `LACES_BASE_URL`                  | Base URL of the Laces instance, e.g. `https://<host>`.                                            |
+| `OUT_HTML`                        | Destination path for the generated HTML report.                                                   |
 
 ---
 
-## Bookmarks / Pipeline Stages
+## FME Bookmarks
 
 ### 1. Excel Config
 
@@ -77,9 +47,9 @@ Filters the Excel rows so only the queries relevant to the selected `Category` r
 
 - `NullAttributeMapper` first normalizes a missing/null `Category` value to `0`, for backward compatibility with older config rows.
 - `Tester` (`T_Catagory_Selection`) passes a row through if **any** of:
-  - `@Value(Category) = $(Category)` — row matches the selected category, or
-  - `@Value(Category) = 0` — row is marked "always run", or
-  - `$(Category) = 0` — the user selected "All".
+  - `@Value(Category) = $(Category)`  row matches the selected category, or
+  - `@Value(Category) = 0`  row is marked "always run", or
+  - `$(Category) = 0`  the user selected "All".
 - A second `NullAttributeMapper` sets a missing `Headers` value to `Misc`, so ungrouped queries still get a report section.
 
 ### 3. TTL to hub.laces
@@ -189,3 +159,4 @@ The Excel file (default `IC_Reader_Tool_Config_v5.xlsx`) is the control table fo
 - Python is only used for the Turtle/zip-combining step (`rdflib`); the rest of the workspace is transformer-driven.
 - The report is deterministic enough (same IC + same queries + same date → same hashes) to support hash-based change tracking between runs.
 - Related files in `Workspaces/IC_Reader_Tool/`: `IC_Reader_Tool.fmw` (earlier baseline), `IC_Reader_Tool_jasper.fmw` (prior iteration), `ICreaderVerifier.fmw` (in-progress verifier workspace), `ShoppingCart.fmw` (unrelated Shopping Cart workspace copied into this folder).
+- Added a new Category can be done by inserting a new string value into the Config file, Add that same value to the user parameter category in the FME workspace and the filter will automatically function.

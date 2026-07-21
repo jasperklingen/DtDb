@@ -1,29 +1,11 @@
-# Shopping Cart — Technical Documentation
-
 ## Overview
 
-The Shopping Cart is a user-facing web form for submitting bulk import jobs to the SOV workspace. It works as a two-stage pipeline:
+The Shopping Cart is a user-facing web form for running SOV workspace based on items selected from a standard design. It works as a two-stage pipeline:
 
 1. **`ShoppingCart.fmw`** queries available items via SPARQL and streams an HTML page back to the user, with the query results embedded as CSV.
-2. **`ShoppingCart.html`** renders those results as an interactive tree, lets the user assign quantities, and fires a webhook call to **`SOV.fmw`** for each selected item.
+2. **`ShoppingCart.html`** renders those results as an interactive tree, lets the user select items and quantities, and fires a webhook call to **`SOV.fmw`** for each selected item and quantity.
 
-```
-User browser
-    │
-    │  HTTP GET /fmedatastreaming/.../ShoppingCart.fmw?CONFIG=…&RelaticsWorkspace=…
-    ▼
-ShoppingCart.fmw
-    ├─ SPARQL query → CSV (uuid, hierarchical path)
-    └─ HTTP Response transformer → streams ShoppingCart.html
-            │  @Value(csv) injected into <script>
-            ▼
-    Browser renders tree
-            │  User fills quantities → clicks Run
-            ▼
-    Per selected item: GET SOV.fmw?SELECTED_GROUP=UUID&COPIES=n&…
-            ▼
-        SOV.fmw  (one job per item)
-```
+![[ShoppingCart-System Overview.drawio.png]]
 
 ---
 
@@ -35,16 +17,17 @@ ShoppingCart.fmw
 
 **Responsibility:** Entry point. Accepts parameters, runs a SPARQL query to retrieve available options, then serves the HTML page with the query results injected.
 
+**Note:** This process is an artifact of earlier solutions, there is no particular reason to make a CSV. This was just the easiest way to transfer the data from FME to HTML.
 #### Published Parameters
 
-| Parameter | Description |
-|---|---|
-| `CONFIG` | Name of the config Excel file (without extension), e.g. `SOV`. The full path is resolved to `$(FME_SHAREDRESOURCE_DATA)/SOV/Config/$(CONFIG).xlsx`. |
-| `RelaticsWorkspace` | Target Relatics workspace identifier. Passed through to `SOV.fmw`. |
-| `BatchSize` | Number of items processed per batch in `SOV.fmw`. Passed through unchanged. |
-| `FME_SERVER_TOKEN` | FME Server token injected automatically. Used by the HTML to authenticate webhook calls. |
-| `FME_JOB_ID` | FME Server job ID injected automatically. Used as `SHOPPINGCART_UUID` to correlate all child jobs back to this cart run. |
-| `FME_SHAREDRESOURCE_DATA` | FME shared resource path, injected automatically. Used to resolve the config file path. |
+| Parameter                 | Description                                                                                                                                         |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CONFIG`                  | Name of the config Excel file (without extension), e.g. `SOV`. The full path is resolved to `$(FME_SHAREDRESOURCE_DATA)/SOV/Config/$(CONFIG).xlsx`. |
+| `RelaticsWorkspace`       | UUID, Target Relatics workspace identifier. Passed through to `SOV.fmw`.                                                                            |
+| `BatchSize`               | Number of items processed per batch in `SOV.fmw`. Passed through unchanged.                                                                         |
+| `FME_SERVER_TOKEN`        | FME Server token injected automatically. Used by the HTML to authenticate webhook calls.                                                            |
+| `FME_JOB_ID`              | FME Server job ID injected automatically. Used as `SHOPPINGCART_UUID` to correlate all child jobs back to this cart run.                            |
+| `FME_SHAREDRESOURCE_DATA` | FME shared resource path, injected automatically. Used to resolve the config file path.                                                             |
 
 #### Transformer Pipeline
 
@@ -52,7 +35,7 @@ The workspace processes data through six logical stages:
 
 **1. Config loading**
 
-`Creator_2` triggers a `FeatureReader` that reads the Excel config file (`SOV.xlsx`, sheet `SOVQuerys`). A `Tester` + `Sampler` + `AttributeKeeper` combination filters the row where `QueryName = "Tree"` and retains only the `Query` and `QueryEndpoint` columns.
+The Excel config file (`SOV.xlsx`, sheet `SOVQuerys`) is read. A `Tester` + `Sampler` + `AttributeKeeper` combination filters the row where `QueryName = "Tree"` and retains only the `Query` and `QueryEndpoint` columns.
 
 **2. SPARQL query execution**
 
@@ -80,7 +63,7 @@ The HTML Writer (format: HTML, dataset: `Tree.html`) is registered on the FME Da
 
 **Location:** `SOV_Shoppingcart/ShoppingCart.html`
 
-**Responsibility:** Rendered in the user's browser. Parses the injected CSV, builds an interactive tree, collects selections, and dispatches webhook calls.
+**Responsibility:** Rendered in the user's browser. Parses the injected CSV, builds an interactive tree, collects selections, and makes webhook calls.
 
 #### Data Injection
 
@@ -115,7 +98,7 @@ On clicking **Run**:
 
 1. All nodes with quantity > 0 are collected.
 2. For each selected node, a `GET` request is fired to `SOV.fmw` with the parameters below.
-3. Requests are fire-and-forget (no response awaited). Results are shown as a status list in the UI.
+3. Requests are fire-and-forget (no response awaited). All the requests that are made each run are shown in the ordered list at the bottom of the page.
 
 ---
 
@@ -123,7 +106,7 @@ On clicking **Run**:
 
 **Location:** FME Server at `https://tennet.vicrea.nl/fmedatastreaming/SOV/SOV.fmw`
 
-**Responsibility:** Processes one selected item per invocation. Triggered by the Shopping Cart HTML, once per selected node.
+**Responsibility:** Processes one selected item per invocation. Triggered by the Shopping Cart HTML, once per selected node. Amount selected on HTML page is passed on as COPIES parameter.
 
 #### Webhook URL Structure
 
@@ -152,36 +135,6 @@ GET /fmedatastreaming/SOV/SOV.fmw
 
 ---
 
-## Data Flow Diagram
-
-```
-FME Server
-┌─────────────────────────────────────────────────────┐
-│                                                     │
-│  ShoppingCart.fmw                                   │
-│  ┌──────────────────────────────────────────────┐   │
-│  │  Parameters: CONFIG, RelaticsWorkspace,      │   │
-│  │              BatchSize                       │   │
-│  │                                              │   │
-│  │  1. SPARQL Reader ──────► CSV               │   │
-│  │  2. HTTPResponse ◄── ShoppingCart.html      │   │
-│  │     (with @Value(csv) replaced)             │   │
-│  └──────────────────────────────────────────────┘   │
-│                          │                          │
-│                    Browser renders                  │
-│                          │                          │
-│                    User selects items               │
-│                          │                          │
-│              ┌───────────┴────────────┐             │
-│              ▼                        ▼             │
-│         SOV.fmw (item A)       SOV.fmw (item B)     │
-│         COPIES=3               COPIES=1             │
-│                                                     │
-└─────────────────────────────────────────────────────┘
-```
-
----
-
 ## Configuration File (`$(CONFIG).xlsx`)
 
 The config file is an Excel workbook stored at:
@@ -196,14 +149,7 @@ Its name is set via the `CONFIG` published parameter and is shown in the Shoppin
 
 ## Adding or Changing Available Items
 
-Items shown in the Shopping Cart tree come exclusively from the SPARQL query inside `ShoppingCart.fmw`. To add, remove, or restructure items:
-
-1. Open `Workspaces/IC_Reader_Tool/ShoppingCart.fmw` in FME Workbench.
-2. Edit the SPARQL Reader or query transformer.
-3. Ensure the output CSV keeps the two-column format: `uuid,path` with `|`-delimited hierarchy in the path column.
-4. Republish the workspace to FME Server.
-
-No changes to `ShoppingCart.html` are needed for content changes.
+This is out of scope for the developer. This is purely a functional admin resposibility. Any changes should be made in the config excel or standard design.
 
 ---
 
