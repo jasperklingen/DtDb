@@ -135,6 +135,12 @@
     <label>Repository</label>
     <select id="filterRepo" class="form-control"><option value="">Alle Repositories</option></select>
   </div>
+  <div class="form-group">
+    <label for="filterHideNoApp">Zonder app</label>
+    <label style="display:flex;align-items:center;gap:6px;height:32px;margin:0;font-weight:normal;text-transform:none;letter-spacing:0">
+      <input type="checkbox" id="filterHideNoApp" checked> Verbergen
+    </label>
+  </div>
   <button class="btn btn-outline-secondary" id="btnClear">Wis Filters</button>
   <div class="refresh-info">
     <div class="spinner" id="spinner"></div>
@@ -461,6 +467,32 @@ function getField(job, ...keys) {
   return '';
 }
 
+// Returns the status to display for a job. ShoppingCart jobs always finish quickly with 'success'
+// because the SOV runs they start are independent jobs, so their status is derived from those
+// SOV child runs (linked via SHOPPINGCART_UUID, see jobDetailsCache):
+//   any cancelled/aborted → cancelled, else any failed → failure,
+//   all queued → queued, else any queued/running → running, else success.
+// Falls back to the job's own status when no child runs are known (yet).
+function getJobStatus(j) {
+  const own = getField(j, 'status', 'jobStatus') || '';
+  if ((getField(j, 'repository', 'repositoryName') || '') !== 'SOV-ShoppingCart') return own;
+
+  const cartId = String(getField(j, 'id', 'jobId'));
+  const childClasses = allJobsWithChildren
+    .filter(c => {
+      const det = jobDetailsCache.get(getField(c, 'id', 'jobId'));
+      return det && det.cartUuid === cartId;
+    })
+    .map(c => statusClass(getField(c, 'status', 'jobStatus') || ''));
+  if (!childClasses.length) return own;
+
+  if (childClasses.some(s => s === 'cancelled' || s === 'aborted')) return 'cancelled';
+  if (childClasses.some(s => s === 'failed'))                         return 'failure';
+  if (childClasses.every(s => s === 'queued'))                        return 'queued';
+  if (childClasses.some(s => s === 'queued' || s === 'running'))      return 'running';
+  return 'success';
+}
+
 // Returns true if the job is a parent (app-level) job. Child jobs spawned by an app
 // have an engineName containing '@', e.g. "localhost_Engine2@112193".
 function isParentJob(j) {
@@ -523,6 +555,7 @@ async function prefetchSovCartUuids() {
     allJobs = allJobsWithChildren.filter(
       j => isParentJob(j) && !sovChildJobIds.has(getField(j, 'id', 'jobId'))
     );
+    updateCounts();
     renderTable();
   }
 }
@@ -619,7 +652,7 @@ function getSortValue(j, col) {
     case 'id':       return String(getField(j, 'id', 'jobId') || '');
     case 'app':      return (getField(j, 'sourceName', 'appName', 'workspaceApp') || '').toLowerCase();
     case 'user':     return (getField(j, 'runtimeUserName', 'submittedBy', 'user') || '').toLowerCase();
-    case 'status':   return (getField(j, 'status', 'jobStatus') || '').toLowerCase();
+    case 'status':   return getJobStatus(j).toLowerCase();
     case 'workspace':return '';
     case 'queued':   return new Date(getField(j, 'timeQueued', 'queueTime', 'submittedTime') || 0).getTime();
     case 'started':  return new Date(getField(j, 'timeStarted', 'startTime') || 0).getTime();
@@ -640,14 +673,16 @@ function renderTable() {
   const fUser   = document.getElementById('filterUser').value;
   const fStatus = document.getElementById('filterStatus').value;
   const fRepo   = document.getElementById('filterRepo').value;
+  const fHideNoApp = document.getElementById('filterHideNoApp').checked;
   const reposForFilter = fRepo ? (REPO_GROUPS[fRepo] || [fRepo]) : null;
 
   const filtered = allJobs.filter(j => {
     const app    = getField(j, 'sourceName', 'appName', 'workspaceApp') || '';
     const user   = getField(j, 'runtimeUserName', 'submittedBy', 'user') || '';
-    const status = getField(j, 'status', 'jobStatus') || '';
+    const status = getJobStatus(j);
     const repo   = getField(j, 'repository', 'repositoryName') || '';
-    return (!fApp           || app === fApp)
+    return (!fHideNoApp     || app)
+        && (!fApp           || app === fApp)
         && (!fUser          || user === fUser)
         && (!fStatus        || status.toUpperCase() === fStatus.toUpperCase())
         && (!reposForFilter || reposForFilter.includes(repo));
@@ -677,7 +712,7 @@ function renderTable() {
   tbody.innerHTML = rows.map(j => {
     const app      = getField(j, 'sourceName', 'appName', 'workspaceApp') || '';
     const user     = getField(j, 'runtimeUserName', 'submittedBy', 'user') || '';
-    const status   = getField(j, 'status', 'jobStatus') || '';
+    const status   = getJobStatus(j);
     const repo     = getField(j, 'repository', 'repositoryName') || '';
     const jobId    = getField(j, 'id', 'jobId') || '';
     const queued   = getField(j, 'timeQueued', 'queueTime', 'submittedTime') || '';
@@ -732,7 +767,7 @@ function fillSelect(id, values) {
 function updateCounts() {
   const counts = { running: 0, queued: 0, success: 0, failed: 0, cancelled: 0 };
   allJobs.forEach(j => {
-    const sc = statusClass(getField(j, 'status', 'jobStatus') || '');
+    const sc = statusClass(getJobStatus(j));
     if (counts[sc] !== undefined) counts[sc]++;
     else if (sc === 'aborted') counts.failed++;
     else counts.queued++;
@@ -769,10 +804,11 @@ function startPolling() {
 document.getElementById('btnRefresh').addEventListener('click', fetchJobs);
 document.getElementById('btnClear').addEventListener('click', () => {
   ['filterApp','filterUser','filterStatus','filterRepo'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('filterHideNoApp').checked = false;
   currentPage = 0;
   renderTable();
 });
-['filterApp','filterUser','filterStatus','filterRepo'].forEach(id =>
+['filterApp','filterUser','filterStatus','filterRepo','filterHideNoApp'].forEach(id =>
   document.getElementById(id).addEventListener('change', () => { currentPage = 0; renderTable(); })
 );
 document.getElementById('btnPrev').addEventListener('click', () => {
@@ -841,7 +877,7 @@ function toggleDetailRow(jobId) {
 function buildDetailPanel(job, childJobs, jobId, isShoppingCart = false) {
   const app      = getField(job, 'sourceName', 'appName', 'workspaceApp') || '(geen app)';
   const user     = getField(job, 'runtimeUserName', 'submittedBy', 'user') || '–';
-  const status   = getField(job, 'status', 'jobStatus') || '';
+  const status   = getJobStatus(job);
   const queued   = getField(job, 'timeQueued', 'queueTime', 'submittedTime') || '';
   const started  = getField(job, 'timeStarted', 'startTime') || '';
   const finished = getField(job, 'timeFinished', 'endTime', 'finishTime') || '';
