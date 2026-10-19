@@ -77,6 +77,7 @@
     .td-id { font-family: monospace; color: #666; }
     .td-workspace a { font-size: 11px; }
     .td-duration { font-family: monospace; }
+    .td-group { max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .pagination-bar { padding: 10px 20px 80px; display: flex; align-items: center; gap: 12px; }
     .pagination-bar .page-info { font-size: 12px; color: #555; }
     .app-link { color: var(--fme-accent); cursor: pointer; text-decoration: none; font-weight: 500; }
@@ -467,6 +468,13 @@ function getField(job, ...keys) {
   return '';
 }
 
+// Minimal HTML escaping for values that come from FME published parameters.
+function escapeHtml(val) {
+  return String(val).replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+}
+
 // Returns the status to display for a job. ShoppingCart jobs always finish quickly with 'success'
 // because the SOV runs they start are independent jobs, so their status is derived from those
 // SOV child runs (linked via SHOPPINGCART_UUID, see jobDetailsCache):
@@ -499,15 +507,28 @@ function isParentJob(j) {
   return !(j.engineName || '').includes('@');
 }
 
-const jobDetailsCache = new Map(); // jobId → { workspace, cartUuid } | null
+const jobDetailsCache = new Map(); // jobId → { workspace, cartUuid, groupName, operation } | null
 const sovChildJobIds  = new Set(); // SOV job IDs confirmed to belong to a ShoppingCart
 
-// Fetches published parameters for a job (RelaticsWorkspace / REL_WORKSPACE + SHOPPINGCART_UUID) in one request,
-// caches the result, and updates any workspace cells currently in the DOM.
+// Extracts the "operation" field from the InputJSON published parameter of a BulkImport
+// child job. Returns null when the parameter is absent or is not valid JSON.
+function parseBulkOperation(raw) {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && parsed.operation ? String(parsed.operation) : null;
+  } catch { return null; }
+}
+
+// Fetches published parameters for a job (RelaticsWorkspace / REL_WORKSPACE + SHOPPINGCART_UUID +
+// SELECTED_GROUP_NAME + InputJSON) in one request, caches the result, and updates any cells
+// currently in the DOM.
 async function fetchAndUpdateWorkspace(jobId) {
-  if (jobDetailsCache.has(jobId)) {
-    const cached = jobDetailsCache.get(jobId);
+  const cached = jobDetailsCache.get(jobId);
+  // Older cache entries predate groupName/operation; re-fetch those so child rows can show them.
+  if (jobDetailsCache.has(jobId) && (!cached || ('groupName' in cached && 'operation' in cached))) {
     updateWorkspaceCell(jobId, cached ? cached.workspace : null);
+    updateOperationCell(jobId, cached ? cached.operation : null);
     return cached;
   }
   try {
@@ -519,10 +540,13 @@ async function fetchAndUpdateWorkspace(jobId) {
     const params = data.publishedParameters || {};
     const details = {
       workspace: params['RelaticsWorkspace'] || params['REL_WORKSPACE'] || null,
-      cartUuid:  params['SHOPPINGCART_UUID'] || null
+      cartUuid:  params['SHOPPINGCART_UUID'] || null,
+      groupName: params['SELECTED_GROUP_NAME'] || null,
+      operation: parseBulkOperation(params['InputJSON'])
     };
     jobDetailsCache.set(jobId, details);
     updateWorkspaceCell(jobId, details.workspace);
+    updateOperationCell(jobId, details.operation);
     return details;
   } catch {
     jobDetailsCache.set(jobId, null);
@@ -607,8 +631,11 @@ async function loadShoppingCartChildren(cartJobId) {
     const cStarted  = getField(c, 'timeStarted', 'startTime') || '';
     const cFinished = getField(c, 'timeFinished', 'endTime', 'finishTime') || '';
     const cSc       = statusClass(cStatus);
+    const cDet      = jobDetailsCache.get(cId);
+    const cGroup    = (cDet && cDet.groupName) || '–';
     return `<tr>
       <td class="td-id"><a href="${FME_SERVER}/fmeserver/job/${cId}/summary" target="_blank">${cId}</a></td>
+      <td class="td-group">${escapeHtml(cGroup)}</td>
       <td><span class="badge-status ${cSc}">${cStatus}</span></td>
       <td>${formatDate(cStarted)}</td>
       <td>${formatDate(cFinished)}</td>
@@ -618,7 +645,7 @@ async function loadShoppingCartChildren(cartJobId) {
 
   container.innerHTML = `<table class="table table-bordered detail-table mt-2">
     <thead><tr>
-      <th>Job ID</th><th>Status</th>
+      <th>Job ID</th><th>Groep</th><th>Status</th>
       <th>Gestart</th><th>Afgerond</th><th>Duur</th>
     </tr></thead>
     <tbody>${rows}</tbody>
@@ -644,6 +671,18 @@ function updateWorkspaceCell(jobId, wsId) {
       detailEl.innerHTML = ids.map(id => `<a href="https://tennet.relaticsonline.com/${id}" target="_blank">${id}</a>`).join(', ');
     }
   }
+}
+
+// Writes the BulkImport operation name (from the InputJSON published parameter) into any
+// operation cells currently in the DOM for this job.
+function updateOperationCell(jobId, operation) {
+  const cells = document.querySelectorAll(`[data-job-op="${jobId}"]`);
+  if (!cells.length) return;
+  const text = operation || '–';
+  cells.forEach(cell => {
+    cell.textContent = text;
+    cell.title = text;
+  });
 }
 
 // Extracts a comparable sort value from a job object for the given column name.
@@ -869,6 +908,9 @@ function toggleDetailRow(jobId) {
   if (link) link.classList.add('expanded');
   fetchAndUpdateWorkspace(jobId);
   if (isShoppingCart) loadShoppingCartChildren(jobId);
+  // BulkImport child rows show the operation name from each child's InputJSON parameter,
+  // so fetch those details in the background and fill the cells as they arrive.
+  else childJobs.forEach(c => fetchAndUpdateWorkspace(getField(c, 'id', 'jobId')));
 }
 
 // Builds the HTML for the detail panel of a parent job, including a summary header with
@@ -889,8 +931,12 @@ function buildDetailPanel(job, childJobs, jobId, isShoppingCart = false) {
     const cStarted  = getField(c, 'timeStarted', 'startTime') || '';
     const cFinished = getField(c, 'timeFinished', 'endTime', 'finishTime') || '';
     const cSc       = statusClass(cStatus);
+    const cDet      = jobDetailsCache.get(cId);
+    // '…' while the job details are still being fetched; '–' once known to be absent.
+    const cOp       = jobDetailsCache.has(cId) ? ((cDet && cDet.operation) || '–') : '…';
     return `<tr>
       <td class="td-id"><a href="${FME_SERVER}/fmeserver/job/${cId}/summary" target="_blank">${cId}</a></td>
+      <td class="td-group" data-job-op="${cId}" title="${escapeHtml(cOp)}">${escapeHtml(cOp)}</td>
       <td><span class="badge-status ${cSc}">${cStatus}</span></td>
       <td>${formatDate(cStarted)}</td>
       <td>${formatDate(cFinished)}</td>
@@ -903,7 +949,7 @@ function buildDetailPanel(job, childJobs, jobId, isShoppingCart = false) {
     : childJobs.length > 0
       ? `<table class="table table-bordered detail-table mt-2">
           <thead><tr>
-            <th>Job ID</th><th>Status</th>
+            <th>Job ID</th><th>Operatie</th><th>Status</th>
             <th>Gestart</th><th>Afgerond</th><th>Duur</th>
           </tr></thead>
           <tbody>${childRows}</tbody>

@@ -1,0 +1,149 @@
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|Current FME version: FME 2025.0.3.0 (20250602 - Build 25241 - WIN64)
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|System Time: 20261019082922 UTC
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|FME_HOME is 'C:\Program Files\FME202503\'
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|FME Form (floating)
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|Temporary License: 347 days left.
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|Machine host name is: AVT-6GQ3PX3
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|OS Locale Name     : en_NL
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|OS Locale Encoding : windows-1252
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|Process Encoding   : UTF-8
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|FME API version: '4.0 20240722'
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|FME Configuration: FME_BASE is 'no'
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|FME Configuration: FME_MF_DIR is 'C:\Users\JasperKlingenAvineon\source\repos\DtDb\Workspaces\SOV-ShoppingCart/'
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|FME Configuration: FME_MF_NAME is 'ShoppingCart.fmw'
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|FME Configuration: FME_PRODUCT_NAME is 'FME(R) 2025.0.3.0'
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|Operating System: Microsoft Windows 11 64-bit  (Build 26200)
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|FME Platform: WIN64
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|System Status: 189.84 GB of disk space available in the FME temporary folder (C:\Users\JASPER~1\AppData\Local\Temp\wbrun_1792398030522_16436\fmetmp_0)
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|System Status: 31.69 GB of physical memory available
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|System Status: 126.77 GB of virtual memory available
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|START - ProcessID: 33332, peak process memory usage: 58484 kB, current process memory usage: 57800 kB
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|FME Configuration: Command line arguments are `C:\Program Files\FME202503\fme.exe' `C:\Users\JasperKlingenAvineon\source\repos\DtDb\Workspaces\SOV-ShoppingCart\wb-xlate-1792398554653_16436' `--FME_LAUNCH_VIEWER_APP' `WORKBENCH' `LOG_STANDARDOUT' `YES' `LOG_TIMINGS' `YES' `LogCountServerName' `61528' `LOG_STANDARDOUT' `No' `WORKBENCH_LOG_SERVER' `52364'
+2026-10-19 10:29:22|   0.0|  0.0|INFORM|FME Configuration: Connection Storage: 'C:\Users\JasperKlingenAvineon\AppData\Roaming\Safe Software\FME\'
+2026-10-19 10:29:27|   0.2|  0.2|INFORM|Shared folders for formats are : C:\Program Files\FME202503\datasources;C:\Users\JasperKlingenAvineon\OneDrive - Avineon-Tensing\Documents\FME\Formats
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|Shared folders for transformers are : C:\Users\JasperKlingenAvineon\AppData\Roaming\Safe Software\FME\Packages\25241-win64\transformers;C:\Program Files\FME202503\transformers;C:\Users\JasperKlingenAvineon\AppData\Roaming\Safe Software\FME\FME Store\Transformers
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|Shared folders for coordinate systems are : C:\Users\JasperKlingenAvineon\OneDrive - Avineon-Tensing\Documents\FME\CoordinateSystems
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|Shared folders for coordinate system exceptions are : C:\Users\JasperKlingenAvineon\OneDrive - Avineon-Tensing\Documents\FME\CoordinateSystemExceptions
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|Shared folders for coordinate system grid overrides are : C:\Users\JasperKlingenAvineon\OneDrive - Avineon-Tensing\Documents\FME\CoordinateSystemGridOverrides
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|Shared folders for CS-MAP transformation exceptions are : C:\Users\JasperKlingenAvineon\OneDrive - Avineon-Tensing\Documents\FME\CsmapTransformationExceptions
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|Shared folders for transformer categories are : C:\Users\JasperKlingenAvineon\OneDrive - Avineon-Tensing\Documents\FME\TransformerCategories
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|Mapping File Identifier is: SetupTreeview
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|FME Configuration: No destination coordinate system set
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|FME Configuration: Current working folder is `C:\Users\JasperKlingenAvineon\source\repos\DtDb\Workspaces\SOV-ShoppingCart'
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|FME Configuration: Temporary folder is `C:\Users\JASPER~1\AppData\Local\Temp\wbrun_1792398030522_16436\fmetmp_0', set from environment variable `FME_TEMP'
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|FME Configuration: Cache folder is 'C:\Users\JASPER~1\AppData\Local\Temp'
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|FME Configuration: FME_HOME is `C:\Program Files\FME202503\'
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|FME Configuration: Start freeing memory when the process exceeds 95.08 GB
+2026-10-19 10:29:27|   0.2|  0.0|INFORM|FME Configuration: Stop freeing memory when the process is below 71.31 GB
+2026-10-19 10:29:30|   0.3|  0.1|INFORM|Creating writer for format: 
+2026-10-19 10:29:30|   0.3|  0.0|INFORM|Creating reader for format: 
+2026-10-19 10:29:30|   0.3|  0.0|INFORM|MULTI_READER(MULTI_READER): Will fail with first member reader failure
+2026-10-19 10:29:30|   0.3|  0.0|INFORM|Using Multi Reader with keyword `MULTI_READER' to read multiple datasets
+2026-10-19 10:29:30|   0.3|  0.0|INFORM|Using MultiWriter with keyword `PRIMARY_DEST' to output data (ID_ATTRIBUTE is `multi_writer_id')
+2026-10-19 10:29:30|   0.3|  0.0|INFORM|Writer output will be ordered by value of multi_writer_id
+2026-10-19 10:29:31|   0.3|  0.0|INFORM|Emptying factory pipeline
+2026-10-19 10:29:31|   0.5|  0.2|INFORM|Creating reader for format: Microsoft Excel
+2026-10-19 10:29:31|   0.5|  0.0|INFORM|Trying to find a DYNAMIC plugin for reader named `XLSXR'
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|FeatureReader (QueryFactory): Performing query against XLSXR dataset `\SOV\Config\SOV.xlsx'
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Creating reader for format: Microsoft Excel
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Trying to find a DYNAMIC plugin for reader named `XLSXR'
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Creating reader for format: Microsoft Excel
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Trying to find a DYNAMIC plugin for reader named `XLSXR'
+2026-10-19 10:29:33|   0.5|  0.0|ERROR |Excel Reader: Failed to open the dataset '\SOV\Config\SOV.xlsx'.  Error message was 'File does not exist'
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |XLSXR reader: An error has occurred. Check the logfile above for details
+2026-10-19 10:29:33|   0.5|  0.0|ERROR |Failed to obtain any schemas from reader 'XLSXR' from 1 datasets. This may be due to invalid datasets or format accessibility issues due to licensing, dependencies, or module loading. See logfile for more information
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |UniversalReader -- readSchema resulted in 0 schema features being returned
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(0) = >\SOV\Config\SOV.xlsx<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(1) = >ADVANCED<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(1) = ><
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(3) = >ALLOW_DOLLAR_SIGNS<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(3) = >YES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(5) = >APPLY_FILTERS<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(5) = >No<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(7) = >CASE_SENSITIVE_FEATURE_TYPES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(7) = >YES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(9) = >CONFIGURATION_DATASET<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(9) = >C:\Users\JasperKlingenAvineon\source\repos\DtDb\Workspaces\SOV-ShoppingCart/SOV\Config\SOV.xlsx<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(11) = >CREATE_FEATURE_TABLES_FROM_DATA<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(11) = >Yes<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(13) = >EXCEL_COL_NAMES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(13) = >YES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(15) = >EXPAND_MERGED_CELLS<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(15) = >Yes<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(17) = >EXPANDED_DATES_SCANNING<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(17) = >No<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(19) = >EXPOSE_ATTRS_GROUP<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(19) = ><
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(21) = >FORCE_DATETIME<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(21) = >NO<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(23) = >NETWORK_AUTHENTICATION<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(23) = ><
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(25) = >QUERY_FEATURE_TYPES_FOR_MERGE_FILTERS<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(25) = >Yes<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(27) = >READ_BLANK_AS<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(27) = >Null<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(29) = >READ_FORM_CONTROLS<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(29) = >NONE<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(31) = >READ_RASTER_MODE<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(31) = >None<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(33) = >REPLACE_ONLY_NEWLINES_CARRIAGE_RETURNS<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(33) = >YES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(35) = >SCAN_FOR_GEOMETRIC_TYPES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(35) = >Yes<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(37) = >SCAN_MAX_FEATURES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(37) = >1000<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(39) = >SCHEMA<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(39) = >SOVQuerys,0<comma>Order<comma>number<comma>2<comma>0<comma><comma>1<comma>Query<comma>char<comma>2529<comma><comma><comma>2<comma>QueryName<comma>char<comma>28<comma><comma><comma>3<comma>QueryEndpoint<comma>char<comma>79<comma><comma><comma>4<comma>Filename<comma>char<comma>74<comma><comma><comma>5<comma>Operation<comma>char<comma>70<comma><comma><comma>6<comma>Entrycode<comma>char<comma>32<comma><comma>,1<comma><comma><comma>,NO<comma>NO<comma>1<comma>C:<lt>backslash<gt>Users<lt>backslash<gt>OscarWillemsAvineon-<lt>backslash<gt>Downloads<lt>backslash<gt>SOV<lt>backslash<gt>Config<lt>backslash<gt>SOV.xlsx<comma><quote>0<comma>0<comma>6<comma>18<quote><comma>Sheet1<comma>NO<comma>NO<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(41) = >SCHEMA_HANDLING_REVISION<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(41) = >2<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(43) = >SKIP_EMPTY_ROWS<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(43) = >YES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(45) = >STRIP_SHEETNAME_SPACES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(45) = >YES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(47) = >TABLELIST<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(47) = >SOVQuerys<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(49) = >TRIM_ATTR_NAME_CHARACTERS<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(49) = ><
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(51) = >TRIM_ATTR_NAME_WHITESPACE<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(51) = >Yes<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(53) = >USE_CUSTOM_SCHEMA<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(53) = >NO<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(55) = >XLSXR_EXPOSE_FORMAT_ATTRS<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(55) = ><
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(57) = >_MERGE_SCHEMAS<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(57) = >YES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(59) = >READER_META_ATTRIBUTES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(59) = >fme_feature_type fme_dataset fme_basename<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(61) = >+ID<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Parameter(61) = >SOVQuerys<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Directive(0) = >METAFILE<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Directive(1) = >XLSXR<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Directive(2) = >RUNTIME_MACROS<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Directive(3) = >ADVANCED,,ALLOW_DOLLAR_SIGNS,YES,APPLY_FILTERS,No,CASE_SENSITIVE_FEATURE_TYPES,YES,CONFIGURATION_DATASET,C:\Users\JasperKlingenAvineon\source\repos\DtDb\Workspaces\SOV-ShoppingCart/SOV\Config\SOV.xlsx,CREATE_FEATURE_TABLES_FROM_DATA,Yes,EXCEL_COL_NAMES,YES,EXPAND_MERGED_CELLS,Yes,EXPANDED_DATES_SCANNING,No,EXPOSE_ATTRS_GROUP,,FORCE_DATETIME,NO,NETWORK_AUTHENTICATION,,QUERY_FEATURE_TYPES_FOR_MERGE_FILTERS,Yes,READ_BLANK_AS,Null,READ_FORM_CONTROLS,NONE,READ_RASTER_MODE,None,REPLACE_ONLY_NEWLINES_CARRIAGE_RETURNS,YES,SCAN_FOR_GEOMETRIC_TYPES,Yes,SCAN_MAX_FEATURES,1000,SCHEMA,"SOVQuerys,0<comma>Order<comma>number<comma>2<comma>0<comma><comma>1<comma>Query<comma>char<comma>2529<comma><comma><comma>2<comma>QueryName<comma>char<comma>28<comma><comma><comma>3<comma>QueryEndpoint<comma>char<comma>79<comma><comma><comma>4<comma>Filename<comma>char<comma>74<comma><comma><comma>5<comma>Operation<comma>char<comma>70<comma><comma><comma>6<comma>Entrycode<comma>char<comma>32<comma><comma>,1<comma><comma><comma>,NO<comma>NO<comma>1<comma>C:<lt>backslash<gt>Users<lt>backslash<gt>OscarWillemsAvineon-<lt>backslash<gt>Downloads<lt>backslash<gt>SOV<lt>backslash<gt>Config<lt>backslash<gt>SOV.xlsx<comma><quote>0<comma>0<comma>6<comma>18<quote><comma>Sheet1<comma>NO<comma>NO",SCHEMA_HANDLING_REVISION,2,SKIP_EMPTY_ROWS,YES,STRIP_SHEETNAME_SPACES,YES,TABLELIST,SOVQuerys,TRIM_ATTR_NAME_CHARACTERS,,TRIM_ATTR_NAME_WHITESPACE,Yes,USE_CUSTOM_SCHEMA,NO,XLSXR_EXPOSE_FORMAT_ATTRS,,_MERGE_SCHEMAS,YES,READER_META_ATTRIBUTES,"fme_feature_type fme_dataset fme_basename"<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Directive(4) = >IDLIST<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Directive(5) = >SOVQuerys<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Directive(6) = >SPLIT_FEATURE_TABLES<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Directive(7) = >no<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Directive(8) = >UNIVERSAL_READER_NUMBER<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |Reader Directive(9) = >1<
+2026-10-19 10:29:33|   0.5|  0.0|WARN  |UniversalReader -- readSchema resulted in 0 schema features being returned
+2026-10-19 10:29:33|   0.5|  0.0|FATAL |The below feature caused the translation to be terminated
+2026-10-19 10:29:33|   0.5|  0.0|STATS |Storing feature(s) to FME feature store file `C:\Users\JasperKlingenAvineon\source\repos\DtDb\Workspaces\SOV-ShoppingCart\ShoppingCart_log.ffs'
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Feature Type: `FEATURE_TYPE'
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Attribute(64 bit unsigned integer): `_creation_instance' has value `0'
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Attribute(string; UTF-8)          : `_reader_error' has value `Failed to obtain any schemas from reader 'XLSXR' from 1 datasets. This may be due to invalid datasets or format accessibility issues due to licensing, dependencies, or module loading. See logfile for more information'
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Attribute(string: UTF-8)          : `fme_feature_type' has value `Creator_2'
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Attribute(indirect: string: UTF-8): `fme_geometry' has value `fme_undefined'
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Attribute(string: UTF-8)          : `fme_type' has value `fme_no_geom'
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|===========================================================================
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Geometry Name: <no name>
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Coordinate System: `Unknown'
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Geometry Type: Null
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Coordinate Dimension: 2
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|===========================================================================
+2026-10-19 10:29:33|   0.5|  0.0|ERROR |FeatureReader_<Rejected> (TeeFactory): FeatureReader_<Rejected>: Termination Message: 'FeatureReader output a <Rejected> feature.  To continue translation when features are rejected, change 'Workspace Parameters' > Translation > 'Rejected Feature Handling' to 'Continue Translation''
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|Translation FAILED with 4 error(s) and 76 warning(s) (0 feature(s) output)
+2026-10-19 10:29:33|   0.5|  0.0|STATS |Stored 1 feature(s) to FME feature store file `C:\Users\JasperKlingenAvineon\source\repos\DtDb\Workspaces\SOV-ShoppingCart\ShoppingCart_log.ffs'
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|FME Session Duration: 11.7 seconds. (CPU: 0.2s user, 0.3s system)
+2026-10-19 10:29:33|   0.5|  0.0|INFORM|END - ProcessID: 33332, peak process memory usage: 74984 kB, current process memory usage: 74948 kB

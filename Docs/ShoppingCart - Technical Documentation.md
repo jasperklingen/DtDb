@@ -3,7 +3,7 @@
 The Shopping Cart is a user-facing web form for running SOV workspace based on items selected from a standard design. It works as a two-stage pipeline:
 
 1. **`ShoppingCart.fmw`** queries available items via SPARQL and streams an HTML page back to the user, with the query results embedded as CSV.
-2. **`ShoppingCart.html`** renders those results as an interactive tree, lets the user select items and quantities, and fires a webhook call to **`SOV.fmw`** for each selected item and quantity.
+2. **`ShoppingCart.html`** renders those results as an interactive tree, lets the user select items and quantities, and submits **one `SOV.fmw` job per copy** through the FME Flow REST jobs API.
 
 ![[ShoppingCart-System Overview.drawio.png]]
 
@@ -25,7 +25,8 @@ The Shopping Cart is a user-facing web form for running SOV workspace based on i
 | `CONFIG`                  | Name of the config Excel file (without extension), e.g. `SOV`. The full path is resolved to `$(FME_SHAREDRESOURCE_DATA)/SOV/Config/$(CONFIG).xlsx`. |
 | `RelaticsWorkspace`       | UUID, Target Relatics workspace identifier. Passed through to `SOV.fmw`.                                                                            |
 | `BatchSize`               | Number of items processed per batch in `SOV.fmw`. Passed through unchanged.                                                                         |
-| `FME_SERVER_TOKEN`        | FME Server token injected automatically. Used by the HTML to authenticate webhook calls.                                                            |
+| `MaxJobRuntime`           | Maximum runtime in seconds for each child `SOV.fmw` job. `0` (or empty/invalid) means no limit. Passed to the REST API as `maxJobRuntime`.          |
+| `FME_SERVER_TOKEN`        | FME Server token injected automatically. Used by the HTML to authenticate job submissions.                                                          |
 | `FME_JOB_ID`              | FME Server job ID injected automatically. Used as `SHOPPINGCART_UUID` to correlate all child jobs back to this cart run.                            |
 | `FME_SHAREDRESOURCE_DATA` | FME shared resource path, injected automatically. Used to resolve the config file path.                                                             |
 
@@ -63,7 +64,7 @@ The HTML Writer (format: HTML, dataset: `Tree.html`) is registered on the FME Da
 
 **Location:** `SOV_Shoppingcart/ShoppingCart.html`
 
-**Responsibility:** Rendered in the user's browser. Parses the injected CSV, builds an interactive tree, collects selections, and makes webhook calls.
+**Responsibility:** Rendered in the user's browser. Parses the injected CSV, builds an interactive tree, collects selections, and submits `SOV.fmw` jobs through the FME Flow REST API.
 
 #### Data Injection
 
@@ -82,7 +83,7 @@ uuid,path
 3f2a1b...,Hoofdgroep|Subgroep|Itemname
 ```
 
-- **Column 1:** UUID — used as `SELECTED_GROUP` in the SOV webhook URL.
+- **Column 1:** UUID — used as `SELECTED_GROUP` in the submitted `SOV.fmw` job.
 - **Column 2:** Pipe-delimited path — determines the tree hierarchy rendered in the UI.
 
 #### Tree Rendering
@@ -90,37 +91,54 @@ uuid,path
 - Paths are split on `|` and built into a nested tree structure.
 - Top-level nodes are expanded by default; deeper levels are collapsed.
 - Each node has a quantity input (integer, 0–20).
-- Nodes without a UUID (intermediate grouping nodes) can still have a quantity assigned.
+- Nodes without a UUID (intermediate grouping nodes) can still have a quantity assigned. These are stored as `path:<path>` in the input's `data-node-id` and are submitted as-is, so the SOV workspace must tolerate a non-UUID `SELECTED_GROUP` (or those nodes should be left at 0).
 
 #### Submit Behaviour
 
 On clicking **Run**:
 
-1. All nodes with quantity > 0 are collected.
-2. For each selected node, a `GET` request is fired to `SOV.fmw` with the parameters below.
-3. Requests are fire-and-forget (no response awaited). All the requests that are made each run are shown in the ordered list at the bottom of the page.
+1. All nodes with quantity > 0 are collected as `{ id, label, count }`.
+2. For each selected node, **one `SOV.fmw` job is submitted per copy** (`count` jobs), each with `COPIES = '1'`. This replaces the older approach of passing the total quantity in `COPIES` to a single streaming GET call.
+3. Jobs are submitted with `POST https://tennet.vicrea.nl/fmeapiv4/jobs` and the JSON body below.
+4. Submissions are fire-and-forget: responses are not awaited, and only failures are logged to the browser console (`console.warn`).
+5. A timestamped batch header plus one result row per selected item (`<n> job(s) sent`) is appended to the log at the bottom of the page.
+6. All quantity inputs are reset to 0 after submission.
+
+#### Job Submission Request
+
+```http
+POST /fmeapiv4/jobs
+Authorization: fmetoken token=<FME_SERVER_TOKEN>
+Content-Type: application/json
+```
+
+```json
+{
+  "repository": "SOV",
+  "workspace": "SOV.fmw",
+  "publishedParameters": {
+    "CONFIG_XLSX": "<FME_SHAREDRESOURCE_DATA>/SOV/Config/<CONFIG>.xlsx",
+    "SELECTED_GROUP": "<uuid or path:...>",
+    "SELECTED_GROUP_NAME": "<Itemname>",
+    "COPIES": "1",
+    "HubLaces": "",
+    "RelaticsWorkspace": "<RelaticsWorkspace>",
+    "BATCH_SIZE": "<BatchSize>",
+    "SHOPPINGCART_UUID": "<FME_JOB_ID>"
+  },
+  "maxJobRuntime": 1
+}
+```
+
+`maxJobRuntime` is only included when `MaxJobRuntime > 0`.
 
 ---
 
 ### 3. `SOV.fmw` — Downstream Workspace
 
-**Location:** FME Server at `https://tennet.vicrea.nl/fmedatastreaming/SOV/SOV.fmw`
+**Location:** FME Server, repository `SOV`, workspace `SOV.fmw`
 
-**Responsibility:** Processes one selected item per invocation. Triggered by the Shopping Cart HTML, once per selected node. Amount selected on HTML page is passed on as COPIES parameter.
-
-#### Webhook URL Structure
-
-```
-GET /fmedatastreaming/SOV/SOV.fmw
-    ?CONFIG_XLSX=<FME_SHAREDRESOURCE_DATA>/SOV/Config/<CONFIG>.xlsx
-    &SELECTED_GROUP=<uuid>
-    &COPIES=<quantity>
-    &RelaticsWorkspace=<RelaticsWorkspace>
-    &BATCH_SIZE=<BatchSize>
-    &SHOPPINGCART_UUID=<FME_JOB_ID>
-```
-
-**Authorization:** `Authorization: fmetoken token=<FME_SERVER_TOKEN>` (header).
+**Responsibility:** Processes one selected item per invocation. Triggered by the Shopping Cart HTML through the REST jobs API, once per selected copy. `COPIES` is always `1`; the number of copies is expressed as the number of jobs submitted.
 
 #### Parameters Received
 
@@ -128,10 +146,32 @@ GET /fmedatastreaming/SOV/SOV.fmw
 |---|---|---|
 | `CONFIG_XLSX` | `$(CONFIG)` from ShoppingCart | Full path to the config Excel file. |
 | `SELECTED_GROUP` | Node UUID from SPARQL result | Identifies which item to process. |
-| `COPIES` | User input (1–20) | How many copies/instances to import. |
+| `SELECTED_GROUP_NAME` | Node name from SPARQL result | Human-readable label of the selected node (e.g. `Itemname`). Required in `SOV.fmw`; used by the Dashboard to show which item a job processed. |
+| `COPIES` | Always `1` | Copies per job; multiplicity is handled by submitting multiple jobs. |
+| `HubLaces` | Hard-coded empty string | Reserved; currently unused. |
 | `RelaticsWorkspace` | Pass-through from ShoppingCart | Target Relatics workspace. |
 | `BATCH_SIZE` | Pass-through from ShoppingCart | Batch size for processing. |
 | `SHOPPINGCART_UUID` | `$(FME_JOB_ID)` from ShoppingCart | Groups all child jobs under the originating cart run. |
+
+#### Job Runtime Limit
+
+`maxJobRuntime` is set on the submitted job when `MaxJobRuntime > 0`, giving FME Flow a hard ceiling on child job duration.
+
+#### `SELECTED_GROUP_NAME`
+
+The HTML sends `SELECTED_GROUP_NAME`, the display name of the selected node (e.g. `Itemname`, without parent path). It is **not used by the SOV workspace logic** — it exists so the Dashboard can display a readable item name next to each child job instead of only the UUID.
+
+Add it to `SOV.fmw` as an optional published parameter:
+
+```
+GUI_LINE="GUI OPTIONAL STRING SELECTED_GROUP_NAME Selected Group Name"
+DEFAULT_VALUE=""
+IS_STAND_ALONE="true"
+```
+
+It must stay **optional**: cart jobs always supply a value, but direct runs from the FME web UI or Workbench do not. No `INCLUDE [...]` validation line is needed, and no transformer wiring is required since the value is read from the job record's `publishedParameters`.
+
+Only jobs submitted after this parameter was introduced carry the name. Older jobs show `–` in the **Groep** column; there is no backfill.
 
 ---
 

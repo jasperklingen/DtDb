@@ -460,6 +460,8 @@
             input.max = 20;
             input.value = 0;
             input.dataset.nodeId = node.url ? node.url : ('path:' + (node.path ? node.path.join(' / ') : node.name));
+            // Node name only, sent to SOV.fmw as SELECTED_GROUP_NAME so the dashboard can show it
+            input.dataset.nodeName = node.name;
             input.addEventListener('input', () => {
                 let v = parseInt(input.value);
                 if (v < 0) input.value = 0;
@@ -538,6 +540,7 @@
                 if (!Number.isNaN(val) && val > 0) {
                     selections.push({
                         id: input.dataset.nodeId,
+                        name: input.dataset.nodeName,
                         label: input.nextSibling.textContent,
                         count: val
                     });
@@ -572,6 +575,7 @@
                     publishedParameters: {
                         CONFIG_XLSX: '$(FME_SHAREDRESOURCE_DATA)/SOV/Config/$(CONFIG).xlsx',
                         SELECTED_GROUP: item.id,
+                        SELECTED_GROUP_NAME: item.name,
                         COPIES: '1',
                         HubLaces: '',
                         RelaticsWorkspace: '$(RelaticsWorkspace)',

@@ -58,17 +58,24 @@ Browser (Dashboard.html)
   "updatedAt": "2026-06-20T10:00:00.000Z",
   "jobs": [ ...FME job objects from /fmeapiv4/jobs... ],
   "details": {
-    "112193": { "workspace": "uuid-...", "cartUuid": null },
-    "112298": { "workspace": null, "cartUuid": "112193" }
+    "112193": { "workspace": "uuid-...", "cartUuid": null, "groupName": null, "operation": null },
+    "112298": { "workspace": null, "cartUuid": "112193", "groupName": "Itemname", "operation": null },
+    "112401": { "workspace": "uuid-...", "cartUuid": null, "groupName": null, "operation": "8.0_Bulk_VS2_08_VS2SPL_Spec-ActivityRelation+Definition" }
   }
 }
 ```
 
 **`jobs`** the main array used to render the table. Contains all jobs fetched from `/fmeapiv4/jobs` across all repos and statuses, filtered to `CACHE_RETENTION_WEEKS`.
 
-**`details`** a map of `jobId → { workspace, cartUuid }`, populated by individual calls to `/fmeapiv4/jobs/{id}`. These are needed because `publishedParameters` (which holds `REL_WORKSPACE` and `SHOPPINGCART_UUID`) is only returned by the single-job endpoint, not the list endpoint. On load, this map is used to pre-populate the in-memory `jobDetailsCache` so those individual calls are not repeated on every page load.
+**`details`** a map of `jobId → { workspace, cartUuid, groupName, operation }`, populated by individual calls to `/fmeapiv4/jobs/{id}`. These are needed because `publishedParameters` (which holds `REL_WORKSPACE`, `SHOPPINGCART_UUID`, `SELECTED_GROUP_NAME` and `InputJSON`) is only returned by the single-job endpoint, not the list endpoint. On load, this map is used to pre-populate the in-memory `jobDetailsCache` so those individual calls are not repeated on every page load.
 
 `cartUuid` being set on a SOV job means it was spawned by a ShoppingCart run. Those jobs are **hidden from the main table** they appear only inside the ShoppingCart row's expand panel.
+
+`groupName` comes from the `SELECTED_GROUP_NAME` published parameter that `ShoppingCart.html` sends with every SOV job. It holds the display name of the selected node (e.g. `Itemname`, without parent path) and is shown in the **Groep** column of the ShoppingCart child table, so the selected item is identifiable without resolving the UUID.
+
+`operation` is extracted from the `InputJSON` published parameter of a BulkImport child job. That parameter is a JSON document (`{ order, query, endpoint, filename, operation, entrycode }`) whose `operation` field names the bulk step, e.g. `8.0_Bulk_VS2_08_VS2SPL_Spec-ActivityRelation+Definition`. `parseBulkOperation()` parses it defensively and returns `null` on absent or malformed JSON. The value is shown in the **Operatie** column of the BulkImport child table.
+
+Cache entries written before `groupName`/`operation` existed are re-fetched once on load (the guard checks for the presence of both keys, not for non-null values).
 
 ---
 
