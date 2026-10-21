@@ -1,0 +1,24 @@
+# ── FME recover files ──
+*.recover
+*.fmw.recover
+*.recover.*
+
+# ── Log files ──
+*.log
+*.log.xml
+*.log.txt
+logs/
+log/
+*.log.*
+
+# ── OS / editor noise ──
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+
+# ── Temp / build output ──
+*.tmp
+*.temp
+~$*
